@@ -110,13 +110,13 @@ extension AMBCoreContext {
     func optMaxAdContentRating() -> GADMaxAdContentRating? {
         switch optString("maxAdContentRating") {
         case "G":
-            return GADMaxAdContentRating.general
+            return .general
         case "MA":
-            return GADMaxAdContentRating.matureAudience
+            return .matureAudience
         case "PG":
-            return GADMaxAdContentRating.parentalGuidance
+            return .parentalGuidance
         case "T":
-            return GADMaxAdContentRating.teen
+            return .teen
         default:
             return nil
         }
@@ -134,15 +134,15 @@ extension AMBCoreContext {
         return optStringArray("testDeviceIds")
     }
 
-    func optGADRequest() -> GADRequest {
-        let request = GADRequest()
+    func optRequest() -> Request {
+        let request = Request()
         if let contentURL = optString("contentUrl") {
             request.contentURL = contentURL
         }
         if let keywords = optStringArray("keywords") {
             request.keywords = keywords
         }
-        let extras = GADExtras()
+        let extras = Extras()
         if let npa = optString("npa") {
             extras.additionalParameters = ["npa": npa]
         }
@@ -159,8 +159,10 @@ extension AMBCoreContext {
     }
 
     func reject() {
-        return reject(AMBCoreError.unknown)
+        reject(AMBCoreError.unknown.localizedDescription)
     }
+
+
 
     func reject(_ error: Error) {
         reject(error.localizedDescription)
@@ -168,27 +170,32 @@ extension AMBCoreContext {
 
     func configure() {
         if let muted = optAppMuted() {
-            GADMobileAds.sharedInstance().applicationMuted = muted
+            MobileAds.shared.isApplicationMuted = muted
+
         }
         if let volume = optAppVolume() {
-            GADMobileAds.sharedInstance().applicationVolume = volume
+            MobileAds.shared.applicationVolume = volume
         }
+        
 
-        let requestConfiguration = GADMobileAds.sharedInstance().requestConfiguration
+        let requestConfiguration = MobileAds.shared.requestConfiguration
         if let maxAdContentRating = optMaxAdContentRating() {
             requestConfiguration.maxAdContentRating = maxAdContentRating
         }
         if let tag = optChildDirectedTreatmentTag() {
-            requestConfiguration.tag(forChildDirectedTreatment: tag)
+            requestConfiguration.tagForChildDirectedTreatment = NSNumber(value: tag)
         }
         if let tag = optUnderAgeOfConsentTag() {
-            requestConfiguration.tagForUnderAge(ofConsent: tag)
+            requestConfiguration.tagForUnderAgeOfConsent = NSNumber(value: tag)
         }
         if let testDevices = optTestDeviceIds() {
             requestConfiguration.testDeviceIdentifiers = testDevices
         }
         if let sameAppKey = optBool("sameAppKey") {
-            requestConfiguration.setSameAppKeyEnabled(sameAppKey)
+            requestConfiguration.setPublisherFirstPartyIDEnabled(sameAppKey)
+        }
+        if let publisherFirstPartyIDEnabled = optBool("publisherFirstPartyIDEnabled") {
+            requestConfiguration.setPublisherFirstPartyIDEnabled(publisherFirstPartyIDEnabled)
         }
 
         resolve()
@@ -200,9 +207,9 @@ class AMBCoreAd: NSObject {
 
     let id: String
     let adUnitId: String
-    let adRequest: GADRequest
+    let adRequest: Request
 
-    init(id: String, adUnitId: String, adRequest: GADRequest) {
+    init(id: String, adUnitId: String, adRequest: Request) {
         self.id = id
         self.adUnitId = adUnitId
         self.adRequest = adRequest
@@ -218,7 +225,7 @@ class AMBCoreAd: NSObject {
         else {
             return nil
         }
-        self.init(id: id, adUnitId: adUnitId, adRequest: ctx.optGADRequest())
+        self.init(id: id, adUnitId: adUnitId, adRequest: ctx.optRequest())
     }
 
     deinit {

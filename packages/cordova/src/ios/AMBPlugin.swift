@@ -2,6 +2,7 @@
     import AppTrackingTransparency
 #endif
 import GoogleMobileAds
+import WebKit
 
 @objc(AMBPlugin)
 class AMBPlugin: CDVPlugin {
@@ -22,7 +23,7 @@ class AMBPlugin: CDVPlugin {
 
         if let x = self.commandDelegate.settings["disableSDKCrashReporting".lowercased()] as? String,
            x == "true" {
-            GADMobileAds.sharedInstance().disableSDKCrashReporting()
+            MobileAds.shared.disableSDKCrashReporting()
         }
     }
 
@@ -39,29 +40,6 @@ class AMBPlugin: CDVPlugin {
         ctx.configure()
     }
 
-    @objc func configRequest(_ command: CDVInvokedUrlCommand) {
-        let ctx = AMBContext(command)
-        let requestConfiguration = GADMobileAds.sharedInstance().requestConfiguration
-
-        if let maxAdContentRating = ctx.optMaxAdContentRating() {
-            requestConfiguration.maxAdContentRating = maxAdContentRating
-        }
-
-        if let tag = ctx.optChildDirectedTreatmentTag() {
-            requestConfiguration.tag(forChildDirectedTreatment: tag)
-        }
-
-        if let tag = ctx.optUnderAgeOfConsentTag() {
-            requestConfiguration.tagForUnderAge(ofConsent: tag)
-        }
-
-        if let testDevices = ctx.optTestDeviceIds() {
-            requestConfiguration.testDeviceIdentifiers = testDevices
-        }
-
-        ctx.resolve()
-    }
-
     @objc func requestTrackingAuthorization(_ command: CDVInvokedUrlCommand) {
         let ctx = AMBContext(command)
 
@@ -76,9 +54,8 @@ class AMBPlugin: CDVPlugin {
 
     @objc func start(_ command: CDVInvokedUrlCommand) {
         let ctx = AMBContext(command)
-
-        GADMobileAds.sharedInstance().start(completionHandler: { _ in
-            ctx.resolve(["version": GADMobileAds.sharedInstance().sdkVersion])
+        MobileAds.shared.start(completionHandler: { _ in
+            ctx.resolve(["version": string(for: MobileAds.shared.versionNumber)])
         })
     }
 
@@ -86,7 +63,7 @@ class AMBPlugin: CDVPlugin {
         let ctx = AMBContext(command)
 
         if let muted = ctx.opt0() as? Bool {
-            GADMobileAds.sharedInstance().applicationMuted = muted
+            MobileAds.shared.isApplicationMuted = muted
             ctx.resolve()
         } else {
             ctx.reject()
@@ -97,7 +74,7 @@ class AMBPlugin: CDVPlugin {
         let ctx = AMBContext(command)
 
         if let volume = ctx.opt0() as? Float {
-            GADMobileAds.sharedInstance().applicationVolume = volume
+            MobileAds.shared.applicationVolume = volume
             ctx.resolve()
         } else {
             ctx.reject()
@@ -195,16 +172,16 @@ class AMBPlugin: CDVPlugin {
 
         DispatchQueue.main.async {
             if let url = URL(string: ctx.optWebviewGoto()+"#from_webview_goto") {
-                let webView = self.webViewEngine.engineWebView as! WKWebView
-                webView.load(URLRequest(url: url))
+                if let webView = self.webViewEngine.engineWebView as? WKWebView {
+                     webView.load(URLRequest(url: url))
+                }
             }
         }
     }
 
     func emit(_ eventName: String, data: Any = NSNull()) {
-        let result = CDVPluginResult(status: CDVCommandStatus_OK, messageAs: ["type": eventName, "data": data])
+        let result = CDVPluginResult(status: .ok, messageAs: ["type": eventName, "data": data])
         result?.setKeepCallbackAs(true)
         self.commandDelegate.send(result, callbackId: readyCallbackId)
     }
-
 }
