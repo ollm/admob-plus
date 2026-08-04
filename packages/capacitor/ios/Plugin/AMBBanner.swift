@@ -21,7 +21,7 @@ extension CAPBridgeViewController {
     }
 }
 
-class AMBBanner: AMBAdBase, GADAdSizeDelegate, GADBannerViewDelegate {
+class AMBBanner: AMBAdBase, AdSizeDelegate, BannerViewDelegate {
     static let stackView = UIStackView(frame: rootView.frame)
     static let placeholderView = UIView(frame: stackView.frame)
 
@@ -37,11 +37,11 @@ class AMBBanner: AMBAdBase, GADAdSizeDelegate, GADBannerViewDelegate {
     static let bottomConstraint = stackView.bottomAnchor.constraint(
             equalTo: AMBHelper.bottomAnchor)
 
-    let adSize: GADAdSize!
+    let adSize: AdSize!
     let position: String!
-    var bannerView: GADBannerView!
+    var bannerView: BannerView!
 
-    init(id: Int, adUnitId: String, adRequest: GADRequest, adSize: GADAdSize, position: String) {
+    init(id: Int, adUnitId: String, adRequest: Request, adSize: AdSize, position: String) {
         self.adSize = adSize
         self.position = position
 
@@ -55,7 +55,7 @@ class AMBBanner: AMBAdBase, GADAdSizeDelegate, GADBannerViewDelegate {
             return nil
         }
 
-        let adSize = GADAdSizeBanner
+        let adSize = AdSizeBanner
         self.init(id: id,
                   adUnitId: adUnitId,
                   adRequest: ctx.optGADRequest(),
@@ -69,7 +69,7 @@ class AMBBanner: AMBAdBase, GADAdSizeDelegate, GADBannerViewDelegate {
 
     override func load(_ ctx: AMBContext) {
         if bannerView == nil {
-            bannerView = GADBannerView(adSize: self.adSize)
+            bannerView = BannerView(adSize: self.adSize)
             bannerView.adSizeDelegate = self
             bannerView.delegate = self
             bannerView.rootViewController = AMBContext.rootViewController
@@ -104,31 +104,31 @@ class AMBBanner: AMBAdBase, GADAdSizeDelegate, GADBannerViewDelegate {
         ctx.resolve()
     }
 
-    func adView(_ bannerView: GADBannerView, willChangeAdSizeTo adSize: GADAdSize) {
+    func adView(_ bannerView: BannerView, willChangeAdSizeTo adSize: AdSize) {
         self.emit(AMBEvents.bannerSizeChange, adSize)
     }
 
-    func bannerViewDidReceiveAd(_ bannerView: GADBannerView) {
+    func bannerViewDidReceiveAd(_ bannerView: BannerView) {
         self.emit(AMBEvents.bannerLoad)
     }
 
-    func bannerView(_ bannerView: GADBannerView,
+    func bannerView(_ bannerView: BannerView,
                     didFailToReceiveAdWithError error: Error) {
         self.emit(AMBEvents.bannerLoadFail, error)
     }
 
-    func bannerViewDidRecordImpression(_ bannerView: GADBannerView) {
+    func bannerViewDidRecordImpression(_ bannerView: BannerView) {
         self.emit(AMBEvents.bannerImpression)
     }
 
-    func bannerViewWillPresentScreen(_ bannerView: GADBannerView) {
+    func bannerViewWillPresentScreen(_ bannerView: BannerView) {
         self.emit(AMBEvents.bannerOpen)
     }
 
-    func bannerViewWillDismissScreen(_ bannerView: GADBannerView) {
+    func bannerViewWillDismissScreen(_ bannerView: BannerView) {
     }
 
-    func bannerViewDidDismissScreen(_ bannerView: GADBannerView) {
+    func bannerViewDidDismissScreen(_ bannerView: BannerView) {
         self.emit(AMBEvents.bannerClose)
     }
 
@@ -178,14 +178,14 @@ class AMBBanner: AMBAdBase, GADAdSizeDelegate, GADBannerViewDelegate {
     }
 
     private static func updateLayout() {
-        if stackView.arrangedSubviews.first is GADBannerView {
+        if stackView.arrangedSubviews.first is BannerView {
             AMBContext.plugin.bridge?.statusBarStyle = .lightContent
             topConstraint.isActive = true
         } else {
             topConstraint.isActive = false
         }
 
-        if stackView.arrangedSubviews.last is GADBannerView {
+        if stackView.arrangedSubviews.last is BannerView {
             bottomConstraint.isActive = true
         } else {
             bottomConstraint.isActive = false

@@ -24,8 +24,8 @@ class AdMobPlusRN: RCTEventEmitter {
 
     @objc func start(_ resolve: @escaping RCTPromiseResolveBlock,
                      rejecter reject: RCTPromiseRejectBlock) {
-        GADMobileAds.sharedInstance().start(completionHandler: { _ in
-            resolve(["version": GADMobileAds.sharedInstance().sdkVersion])
+        MobileAds.shared.start(completionHandler: { _ in
+            resolve(["version": MobileAds.shared.versionNumber])
         })
     }
 
@@ -35,25 +35,25 @@ class AdMobPlusRN: RCTEventEmitter {
         let ctx = AMBContext(opts, resolve, reject)
 
         if let muted = ctx.optAppMuted() {
-            GADMobileAds.sharedInstance().applicationMuted = muted
+            MobileAds.shared.isApplicationMuted = muted
         }
 
         if let volume = ctx.optAppVolume() {
-            GADMobileAds.sharedInstance().applicationVolume = volume
+            MobileAds.shared.applicationVolume = volume
         }
 
-        let requestConfiguration = GADMobileAds.sharedInstance().requestConfiguration
+        let requestConfiguration = MobileAds.shared.requestConfiguration
 
         if let maxAdContentRating = ctx.optMaxAdContentRating() {
             requestConfiguration.maxAdContentRating = maxAdContentRating
         }
 
         if let tag = ctx.optChildDirectedTreatmentTag() {
-            requestConfiguration.tag(forChildDirectedTreatment: tag)
+            requestConfiguration.ageRestrictedTreatment = .tagForChildDirectedTreatment
         }
 
         if let tag = ctx.optUnderAgeOfConsentTag() {
-            requestConfiguration.tagForUnderAge(ofConsent: tag)
+            requestConfiguration.ageRestrictedTreatment = .tagForUnderAgeOfConsent
         }
 
         if let testDevices = ctx.optTestDeviceIds() {

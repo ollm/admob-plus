@@ -1,7 +1,7 @@
 import GoogleMobileAds
 
-class AMBRewardedInterstitial: AMBAdBase, GADFullScreenContentDelegate {
-    var ad: GADRewardedInterstitialAd?
+class AMBRewardedInterstitial: AMBAdBase, FullScreenContentDelegate {
+    var ad: RewardedInterstitialAd?
 
     deinit {
         clear()
@@ -14,7 +14,7 @@ class AMBRewardedInterstitial: AMBAdBase, GADFullScreenContentDelegate {
     override func load(_ ctx: AMBContext) {
         clear()
 
-        GADRewardedInterstitialAd.load(withAdUnitID: adUnitId, request: adRequest, completionHandler: { ad, error in
+        RewardedInterstitialAd.load(withAdUnitID: adUnitId, request: adRequest, completionHandler: { ad, error in
             if error != nil {
                 self.emit(AMBEvents.adLoadFail, error!)
                 ctx.reject(error!)
@@ -39,20 +39,20 @@ class AMBRewardedInterstitial: AMBAdBase, GADFullScreenContentDelegate {
         ctx.resolve()
     }
 
-    func adDidRecordImpression(_ ad: GADFullScreenPresentingAd) {
+    func adDidRecordImpression(_ ad: FullScreenPresentingAd) {
         self.emit(AMBEvents.adImpression)
     }
 
-    func ad(_ ad: GADFullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
+    func ad(_ ad: FullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
         clear()
         self.emit(AMBEvents.adShowFail, error)
     }
 
-    func adDidPresentFullScreenContent(_ ad: GADFullScreenPresentingAd) {
+    func adDidPresentFullScreenContent(_ ad: FullScreenPresentingAd) {
         self.emit(AMBEvents.adShow)
     }
 
-    func adDidDismissFullScreenContent(_ ad: GADFullScreenPresentingAd) {
+    func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
         clear()
         self.emit(AMBEvents.adDismiss)
     }

@@ -66,13 +66,13 @@ class AMBContext: AMBCoreContext {
         return opts?.value(forKey: key)
     }
 
-    func optGADServerSideVerificationOptions() -> GADServerSideVerificationOptions? {
+    func optGADServerSideVerificationOptions() -> ServerSideVerificationOptions? {
         guard let ssv = opt("serverSideVerification") as? NSDictionary
         else {
             return nil
         }
 
-        let options = GADServerSideVerificationOptions.init()
+        let options = ServerSideVerificationOptions.init()
         if let customData = ssv.value(forKey: "customData") as? String {
             options.customRewardString = customData
         }

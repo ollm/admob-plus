@@ -37,7 +37,7 @@ public class AdMobPlusPlugin: CAPPlugin, AMBHelperAdapter {
     }
 
     @objc func start(_ call: CAPPluginCall) {
-        GADMobileAds.sharedInstance().start(completionHandler: { _ in
+        MobileAds.shared.start(completionHandler: { _ in
             call.resolve()
         })
     }
@@ -49,18 +49,18 @@ public class AdMobPlusPlugin: CAPPlugin, AMBHelperAdapter {
 
     @objc func configRequest(_ call: CAPPluginCall) {
         let ctx = AMBContext(call)
-        let requestConfiguration = GADMobileAds.sharedInstance().requestConfiguration
+        let requestConfiguration = MobileAds.shared.requestConfiguration
 
         if let maxAdContentRating = ctx.optMaxAdContentRating() {
             requestConfiguration.maxAdContentRating = maxAdContentRating
         }
 
-        if let tag = ctx.optChildDirectedTreatmentTag() {
-            requestConfiguration.tag(forChildDirectedTreatment: tag)
+        if ctx.optChildDirectedTreatmentTag() != nil {
+            requestConfiguration.ageRestrictedTreatment = .tagForChildDirectedTreatment
         }
 
-        if let tag = ctx.optUnderAgeOfConsentTag() {
-            requestConfiguration.tagForUnderAge(ofConsent: tag)
+        if ctx.optUnderAgeOfConsentTag() != nil {
+            requestConfiguration.ageRestrictedTreatment = .tagForUnderAgeOfConsent
         }
 
         if let testDevices = ctx.optTestDeviceIds() {
