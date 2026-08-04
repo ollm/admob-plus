@@ -36,12 +36,12 @@ fun buildAdRequest(opts: JSONObject): AdRequest {
 fun buildAdSize(opts: JSONObject, activity: Activity): AdSize {
     val name = "size"
     if (!opts.has(name)) {
-        return AdSize.SMART_BANNER
+        return AdSize.BANNER
     }
     val adSizeObj = opts.optJSONObject(name)
     val adSize = AdSizeType.getAdSize(opts.optInt(name))
     if (adSizeObj == null) {
-        return adSize ?: AdSize.SMART_BANNER
+        return adSize ?: AdSize.BANNER
     }
     val adaptive = adSizeObj.optString("adaptive")
     val w =

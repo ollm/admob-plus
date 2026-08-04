@@ -16,6 +16,30 @@ Or via [Cordova CLI](https://www.npmjs.com/package/cordova):
 cordova plugin add admob-plus-cordova --save --variable APP_ID_ANDROID=ca-app-pub-xxx~xxx --variable APP_ID_IOS=ca-app-pub-xxx~xxx
 ```
 
+### Local development
+
+Use Node.js 20 or newer, then build the plugin from the monorepo:
+
+```shell
+pnpm --filter admob-plus-cordova build
+```
+
+From the Cordova application, remove the installed copy and add the local package:
+
+```shell
+cordova plugin remove admob-plus-cordova --nosave
+cordova plugin add /absolute/path/to/admob-plus/packages/cordova --nosave \
+  --variable APP_ID_ANDROID=ca-app-pub-xxx~xxx \
+  --variable APP_ID_IOS=ca-app-pub-xxx~xxx
+cordova platform remove android
+cordova platform add android@14
+cordova prepare android
+cordova build android
+```
+
+The local package uses `play-services-ads:25.4.0` by default. To override it for a specific
+application, pass `--variable PLAY_SERVICES_VERSION=25.4.0` when adding the plugin.
+
 <Tabs
   defaultValue="android"
   values={[
@@ -25,7 +49,7 @@ cordova plugin add admob-plus-cordova --save --variable APP_ID_ANDROID=ca-app-pu
   <TabItem value="android">
 
 `com.google.android.gms:play-services-ads:$PLAY_SERVICES_VERSION` is available for configuration,
-the default is `--PLAY_SERVICES_VERSION=23.6.0`.
+the default is `--PLAY_SERVICES_VERSION=25.4.0`.
 
 When using with other plugins and encountering errors, set `AndroidXEnabled` to `true`.
 

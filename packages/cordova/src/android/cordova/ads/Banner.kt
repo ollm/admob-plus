@@ -30,7 +30,7 @@ enum class AdSizeType {
                 MEDIUM_RECTANGLE -> AdSize.MEDIUM_RECTANGLE
                 FULL_BANNER -> AdSize.FULL_BANNER
                 LEADERBOARD -> AdSize.LEADERBOARD
-                SMART_BANNER -> AdSize.SMART_BANNER
+                SMART_BANNER -> AdSize.BANNER
                 else -> null
             }
         }
@@ -306,7 +306,7 @@ class Banner(ctx: ExecuteContext) : AdBase(ctx) {
                     MEDIUM_RECTANGLE -> AdSize.MEDIUM_RECTANGLE
                     FULL_BANNER -> AdSize.FULL_BANNER
                     LEADERBOARD -> AdSize.LEADERBOARD
-                    SMART_BANNER -> AdSize.SMART_BANNER
+                    SMART_BANNER -> AdSize.BANNER
                     else -> null
                 }
             }

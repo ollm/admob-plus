@@ -25,7 +25,7 @@ class Banner(ctx: ExecuteContext) : AdBase(ctx), GenericAd {
     private var adView: AdView? = null
 
     init {
-        adSize = AdSize.SMART_BANNER
+        adSize = AdSize.BANNER
         gravity = if ("top" == ctx.optPosition()) Gravity.TOP else Gravity.BOTTOM
     }
 
@@ -36,7 +36,7 @@ class Banner(ctx: ExecuteContext) : AdBase(ctx), GenericAd {
         if (adView == null) {
             adView = AdView(activity)
             adView!!.adUnitId = adUnitId
-            // adView!!.adSize = adSize
+            adView!!.setAdSize(adSize)
             adView!!.adListener = object : AdListener() {
                 override fun onAdClicked() {
                     emit(Generated.Events.BANNER_CLICK)

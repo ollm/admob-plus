@@ -4,30 +4,30 @@ def safeExtGet(prop, fallback) {
     rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
 }
 
-def googlePlayServicesAdsVersion = safeExtGet('googlePlayServicesAdsVersion', '21.5.0')
+def googlePlayServicesAdsVersion = safeExtGet('googlePlayServicesAdsVersion', '25.4.0')
 
 buildscript {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
     dependencies {
-        classpath('com.android.tools.build:gradle:4.2.2')
+        classpath('com.android.tools.build:gradle:8.6.1')
     }
 }
 
 android {
-    compileSdkVersion safeExtGet('compileSdkVersion', 28)
-    buildToolsVersion safeExtGet('buildToolsVersion', '28.0.3')
+    namespace 'admob.plus.rn'
+    compileSdk safeExtGet('compileSdkVersion', 35)
     defaultConfig {
-        minSdkVersion safeExtGet('minSdkVersion', 16)
-        targetSdkVersion safeExtGet('targetSdkVersion', 28)
+        minSdk safeExtGet('minSdkVersion', 23)
+        targetSdk safeExtGet('targetSdkVersion', 35)
         versionCode 1
         versionName "1.0"
     }
    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+       sourceCompatibility JavaVersion.VERSION_17
+       targetCompatibility JavaVersion.VERSION_17
     }
 }
 
