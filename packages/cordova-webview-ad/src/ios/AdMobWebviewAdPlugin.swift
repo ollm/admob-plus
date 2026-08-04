@@ -13,7 +13,7 @@ class AdMobWebviewAdPlugin: CDVPlugin, WKNavigationDelegate {
         if let x = self.commandDelegate.settings["AdMobPlusWebViewAd".lowercased()] as? String,
            x == "true" {
             let webView = self.webViewEngine.engineWebView as! WKWebView
-            GADMobileAds.sharedInstance().register(webView)
+            MobileAds.shared.register(webView)
             // webView.reload()
         }
 
