@@ -2,6 +2,7 @@
     import AppTrackingTransparency
 #endif
 import GoogleMobileAds
+import WebKit
 
 @objc(AMBPlugin)
 class AMBPlugin: CDVPlugin {
@@ -22,7 +23,7 @@ class AMBPlugin: CDVPlugin {
 
         if let x = self.commandDelegate.settings["disableSDKCrashReporting".lowercased()] as? String,
            x == "true" {
-            GADMobileAds.sharedInstance().disableSDKCrashReporting()
+            MobileAds.shared.disableSDKCrashReporting()
         }
     }
 
@@ -58,8 +59,8 @@ class AMBPlugin: CDVPlugin {
 
     @objc func start(_ command: CDVInvokedUrlCommand) {
         let ctx = AMBContext(command)
-        GADMobileAds.sharedInstance().start(completionHandler: { _ in
-            ctx.resolve(["version": GADGetStringFromVersionNumber(GADMobileAds.sharedInstance().versionNumber)])
+        MobileAds.shared.start(completionHandler: { _ in
+            ctx.resolve(["version": string(for: MobileAds.shared.versionNumber)])
         })
     }
 
@@ -67,7 +68,7 @@ class AMBPlugin: CDVPlugin {
         let ctx = AMBContext(command)
 
         if let muted = ctx.opt0() as? Bool {
-            GADMobileAds.sharedInstance().applicationMuted = muted
+            MobileAds.shared.isApplicationMuted = muted
             ctx.resolve()
         } else {
             ctx.reject()
@@ -78,7 +79,7 @@ class AMBPlugin: CDVPlugin {
         let ctx = AMBContext(command)
 
         if let volume = ctx.opt0() as? Float {
-            GADMobileAds.sharedInstance().applicationVolume = volume
+            MobileAds.shared.applicationVolume = volume
             ctx.resolve()
         } else {
             ctx.reject()
@@ -176,16 +177,16 @@ class AMBPlugin: CDVPlugin {
 
         DispatchQueue.main.async {
             if let url = URL(string: ctx.optWebviewGoto()+"#from_webview_goto") {
-                let webView = self.webViewEngine.engineWebView as! WKWebView
-                webView.load(URLRequest(url: url))
+                if let webView = self.webViewEngine.engineWebView as? WKWebView {
+                     webView.load(URLRequest(url: url))
+                }
             }
         }
     }
 
     func emit(_ eventName: String, data: Any = NSNull()) {
-        let result = CDVPluginResult(status: CDVCommandStatus_OK, messageAs: ["type": eventName, "data": data])
+        let result = CDVPluginResult(status: .ok, messageAs: ["type": eventName, "data": data])
         result?.setKeepCallbackAs(true)
         self.commandDelegate.send(result, callbackId: readyCallbackId)
     }
-
 }
