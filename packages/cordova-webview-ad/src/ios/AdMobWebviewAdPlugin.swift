@@ -1,4 +1,5 @@
 import GoogleMobileAds
+import WebKit
 
 @objc(AdMobWebviewAdPlugin)
 class AdMobWebviewAdPlugin: CDVPlugin, WKNavigationDelegate {

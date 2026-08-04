@@ -1,18 +1,18 @@
-import cordovaCommon from 'cordova-common';
-import 'cordova-plus';
-import {execa} from 'execa';
-import glob from 'fast-glob';
-import yaml from 'js-yaml';
-import {ListrTask} from 'listr2';
-import _ from 'lodash';
-import {createRequire} from 'node:module';
-import path from 'node:path';
-import {findPkg, PackageJson} from 'pkg-proxy';
-import semver from 'semver';
-import {collectDependencies} from './android.js';
-import {Ctx} from './listr.js';
+import cordovaCommon from "cordova-common";
+import "cordova-plus";
+import { createRequire } from "node:module";
+import path from "node:path";
+import { execa } from "execa";
+import glob from "fast-glob";
+import yaml from "js-yaml";
+import type { ListrTask } from "listr2";
+import _ from "lodash";
+import { type PackageJson, findPkg } from "pkg-proxy";
+import semver from "semver";
+import { collectDependencies } from "./android.js";
+import type { Ctx } from "./listr.js";
 
-const {ConfigParser, PluginInfo} = cordovaCommon;
+const { ConfigParser, PluginInfo } = cordovaCommon;
 const require = createRequire(import.meta.url);
 
 export async function readConfigXml(filename: string) {
@@ -25,25 +25,28 @@ export async function readConfigXml(filename: string) {
 
 export async function readPluginInfo(pkgName: string) {
   const plugin = new PluginInfo(
-    path.dirname(require.resolve(`${pkgName}/plugin.xml`))
+    path.dirname(require.resolve(`${pkgName}/plugin.xml`)),
   );
   return plugin;
 }
 
 export async function readAdMobPlusPluginInfo() {
-  const plugin = await readPluginInfo('admob-plus-cordova');
-  const playServicesVersion = plugin._et
+  const plugin = await readPluginInfo("admob-plus-cordova");
+  const playServicesPreference = plugin._et
     .find(
-      './platform/[@name="android"]/preference/[@name="PLAY_SERVICES_VERSION"]'
-    )!
-    .get('default')!;
-  const iosSDKVersion = plugin._et
+      './platform/[@name="android"]/preference/[@name="PLAY_SERVICES_VERSION"]',
+    )
+    ?.get("default");
+  const iosSDKSpec = plugin._et
     .find(
-      './platform/[@name="ios"]/podspec/pods/pod/[@name="Google-Mobile-Ads-SDK"]'
-    )!
-    .get('spec')!
-    .replace('~>', '')
-    .trim();
+      './platform/[@name="ios"]/podspec/pods/pod/[@name="Google-Mobile-Ads-SDK"]',
+    )
+    ?.get("spec");
+  if (!playServicesPreference || !iosSDKSpec) {
+    throw new Error("Invalid admob-plus-cordova plugin.xml");
+  }
+  const playServicesVersion = playServicesPreference;
+  const iosSDKVersion = iosSDKSpec.replace("~>", "").trim();
   return {
     ...plugin,
     playServicesVersion,
@@ -53,9 +56,9 @@ export async function readAdMobPlusPluginInfo() {
 
 export default [
   {
-    title: 'Cordova Android dependencies',
+    title: "Cordova Android dependencies",
     async task(ctx, task) {
-      const deps = await collectDependencies({cwd: 'platforms/android'});
+      const deps = await collectDependencies({ cwd: "platforms/android" });
       if (!deps) {
         task.skip();
         return;
@@ -64,10 +67,10 @@ export default [
       return task.newListr([
         {
           async task(_ctxAds, taskAds) {
-            const k = 'com.google.android.gms:play-services-ads';
+            const k = "com.google.android.gms:play-services-ads";
             taskAds.title = k;
             const versions = deps[k];
-            const s = `${k}: ${[...versions].join(', ')}`;
+            const s = `${k}: ${[...versions].join(", ")}`;
             if (versions.has(ctx.playServicesVersion)) {
               taskAds.title = s;
             } else {
@@ -79,10 +82,10 @@ export default [
     },
   },
   {
-    title: 'config.xml',
+    title: "config.xml",
     async task(ctx, task) {
-      const {pkg} = ctx;
-      const filename = 'config.xml';
+      const { pkg } = ctx;
+      const filename = "config.xml";
       const config = await readConfigXml(filename);
       if (!ctx.pkg || !config) {
         task.skip();
@@ -90,23 +93,23 @@ export default [
       }
 
       const tasksPrefs = _.map(
-        {SwiftVersion: ctx.swiftVersion, 'deployment-target': '11.0'},
+        { SwiftVersion: ctx.swiftVersion, "deployment-target": "13.0" },
         (expectedVersion, prefName) => {
           const title = `platform[name="ios"]/preference[name="${prefName}"]`;
           return {
             title,
             async task(_ctx, taskPref) {
               try {
-                const version = config.getPreference(prefName, 'ios');
+                const version = config.getPreference(prefName, "ios");
                 if (!version) {
                   throw new Error(`${title}: missing / invalid`);
                 }
-                if (
-                  semver.gte(
-                    semver.coerce(version)!,
-                    semver.coerce(expectedVersion)!
-                  )
-                ) {
+                const coercedVersion = semver.coerce(version);
+                const coercedExpectedVersion = semver.coerce(expectedVersion);
+                if (!coercedVersion || !coercedExpectedVersion) {
+                  throw new Error(`${title}: missing / invalid`);
+                }
+                if (semver.gte(coercedVersion, coercedExpectedVersion)) {
                   taskPref.title = `${title}: ${version}`;
                 } else {
                   throw new Error(`${title}: ${version} < ${expectedVersion}`);
@@ -116,12 +119,12 @@ export default [
               }
             },
           } as ListrTask;
-        }
+        },
       );
 
-      const plugins = _.get(pkg, 'cordova.plugins', {});
+      const plugins = _.get(pkg, "cordova.plugins", {});
       const tasksVars = _.flatMap(plugins, (vars, name) => {
-        const xmlVars = _.get(config.getPlugin(name), 'variables');
+        const xmlVars = _.get(config.getPlugin(name), "variables");
         if (!xmlVars) {
           return [];
         }
@@ -139,16 +142,16 @@ export default [
                   throw new Error(`${k}: ${xmlVars[k]} != ${v}`);
                 }
               },
-            } as ListrTask)
+            }) as ListrTask,
         );
       });
-      return task.newListr([...tasksPrefs, ...tasksVars], {concurrent: true});
+      return task.newListr([...tasksPrefs, ...tasksVars], { concurrent: true });
     },
   },
   {
-    title: 'platforms/ios/*.xcodeproj',
+    title: "platforms/ios/*.xcodeproj",
     async task(ctx, task) {
-      const [filename] = await glob('platforms/ios/*.xcodeproj', {
+      const [filename] = await glob("platforms/ios/*.xcodeproj", {
         onlyDirectories: true,
       });
       if (!filename) {
@@ -157,9 +160,9 @@ export default [
       }
       task.title = filename;
       const p = await execa(
-        'xcodeproj',
-        ['show', '--format=tree_hash', filename],
-        {reject: false}
+        "xcodeproj",
+        ["show", "--format=tree_hash", filename],
+        { reject: false },
       );
       if (p.failed) {
         task.skip();
@@ -167,7 +170,7 @@ export default [
       }
       const o = yaml.load(p.stdout);
 
-      const title = 'SWIFT_VERSION';
+      const title = "SWIFT_VERSION";
       return task.newListr([
         {
           title,
@@ -175,51 +178,53 @@ export default [
             const expectedVersion = ctx.swiftVersion;
             const swiftVersion = _.get(
               o,
-              'rootObject.buildConfigurationList.buildConfigurations[0].buildSettings.SWIFT_VERSION'
+              "rootObject.buildConfigurationList.buildConfigurations[0].buildSettings.SWIFT_VERSION",
             );
             if (!swiftVersion) {
               throw new Error(`${title}: missing`);
             }
-            if (
-              semver.gte(
-                semver.coerce(swiftVersion)!,
-                semver.coerce(expectedVersion)!
-              )
-            ) {
+            const coercedSwiftVersion = semver.coerce(swiftVersion);
+            const coercedExpectedVersion = semver.coerce(expectedVersion);
+            if (!coercedSwiftVersion || !coercedExpectedVersion) {
+              throw new Error(`${title}: missing / invalid`);
+            }
+            if (semver.gte(coercedSwiftVersion, coercedExpectedVersion)) {
               taskSwift.title = `${title}: ${swiftVersion}`;
             } else {
               taskSwift.output = `Set \`SwiftVersion\` preference in \`config.xml\` to \`${expectedVersion}\``;
               throw new Error(`${title}: ${swiftVersion} < ${expectedVersion}`);
             }
           },
-          options: {persistentOutput: true},
+          options: { persistentOutput: true },
         },
       ]);
     },
   },
   {
-    title: 'plugins/admob-plus-cordova/package.json',
+    title: "plugins/admob-plus-cordova/package.json",
     async task(_ctx, task) {
-      const pkgCordova = await findPkg({cwd: 'plugins/admob-plus-cordova'});
+      const pkgCordova = await findPkg({ cwd: "plugins/admob-plus-cordova" });
       const pkgLatest =
-        require('admob-plus-cordova/package.json') as PackageJson;
+        require("admob-plus-cordova/package.json") as PackageJson;
       if (!pkgCordova || !pkgCordova.version || !pkgLatest.version) {
         task.skip();
         return;
       }
 
+      const pkgCordovaVersion = pkgCordova.version;
+      const pkgLatestVersion = pkgLatest.version;
       return task.newListr([
         {
-          title: `${pkgCordova.name}: ${pkgCordova.version}`,
+          title: `${pkgCordova.name}: ${pkgCordovaVersion}`,
           async task(_ctxPkg, taskPkg) {
-            if (semver.lt(pkgCordova.version!, pkgLatest.version!)) {
+            if (semver.lt(pkgCordovaVersion, pkgLatestVersion)) {
               taskPkg.output = `Update to latest version: ${pkgLatest.version}`;
               throw new Error(
-                `${pkgCordova.name}: ${pkgCordova.version} < ${pkgLatest.version}`
+                `${pkgCordova.name}: ${pkgCordova.version} < ${pkgLatest.version}`,
               );
             }
           },
-          options: {persistentOutput: true},
+          options: { persistentOutput: true },
         },
       ]);
     },
