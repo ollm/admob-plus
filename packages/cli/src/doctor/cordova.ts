@@ -1,5 +1,6 @@
 import cordovaCommon from "cordova-common";
 import "cordova-plus";
+import { readFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { execa } from "execa";
@@ -31,22 +32,29 @@ export async function readPluginInfo(pkgName: string) {
 }
 
 export async function readAdMobPlusPluginInfo() {
-  const plugin = await readPluginInfo("admob-plus-cordova");
+  const pluginDir = path.dirname(
+    require.resolve("admob-plus-cordova/plugin.xml"),
+  );
+  const plugin = new PluginInfo(pluginDir);
   const playServicesPreference = plugin._et
     .find(
       './platform/[@name="android"]/preference/[@name="PLAY_SERVICES_VERSION"]',
     )
     ?.get("default");
-  const iosSDKSpec = plugin._et
-    .find(
-      './platform/[@name="ios"]/podspec/pods/pod/[@name="Google-Mobile-Ads-SDK"]',
-    )
-    ?.get("spec");
-  if (!playServicesPreference || !iosSDKSpec) {
+  if (!playServicesPreference) {
     throw new Error("Invalid admob-plus-cordova plugin.xml");
   }
   const playServicesVersion = playServicesPreference;
-  const iosSDKVersion = iosSDKSpec.replace("~>", "").trim();
+  const packageSwift = await readFile(
+    path.join(pluginDir, "Package.swift"),
+    "utf8",
+  );
+  const iosSDKVersion = packageSwift.match(
+    /swift-package-manager-google-mobile-ads\.git",\s*from: "([\d.]+)"/s,
+  )?.[1];
+  if (!iosSDKVersion) {
+    throw new Error("Invalid admob-plus-cordova Package.swift");
+  }
   return {
     ...plugin,
     playServicesVersion,

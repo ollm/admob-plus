@@ -13,3 +13,8 @@ website/i18n/*
 /.idea/
 
 .turbo
+
+# Ignore Swift Package Manager generated files
+.build
+.swiftpm
+Package.resolved

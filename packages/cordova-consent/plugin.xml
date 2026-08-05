@@ -23,7 +23,7 @@
         <framework src="com.google.android.ump:user-messaging-platform:$UMP_VERSION" />
     </platform>
 
-    <platform name="ios">
+    <platform name="ios" package="swift">
         <config-file target="config.xml" parent="/*">
             <feature name="Consent">
                 <param name="ios-package" value="CSNConsent" />
@@ -36,13 +36,5 @@
 
         <framework src="AppTrackingTransparency.framework" weak="true" />
 
-        <podspec>
-            <config>
-                <source url="https://cdn.cocoapods.org/" />
-            </config>
-            <pods use-frameworks="true">
-                <pod name="GoogleUserMessagingPlatform" spec="~> 2.5.0" />
-            </pods>
-        </podspec>
     </platform>
 </plugin>

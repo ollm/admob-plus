@@ -113,13 +113,19 @@ Please ensusre `<preference name="SwiftVersion" value="5.3" />` is added to the 
 
 No, [`SKAdNetworkItems`](https://github.com/admob-plus/admob-plus/blob/master/packages/cordova/plugin.xml#L87) will be set by the plugin, which located in `platforms/ios/<PROJECT>/<PROJECT>-Info.plist`.
 
-### How to fix `'GoogleMobileAds/GoogleMobileAds.h' file not found` error?
+### How to fix `No such module 'GoogleMobileAds'` error?
 
-This is likely caused by CocoaPods is not installing the dependencies correctly.
+This is likely caused by Swift Package Manager not resolving the plugin dependencies correctly.
 
-Run `pod repo update` and `cd platforms/ios && pod install --repo-update` to ensure latest SDK is ready.
+Remove and re-add the iOS platform to regenerate the Swift package dependencies:
 
-A clean build / remove then re-add the plugin may be necessary.
+```sh
+cordova platform remove ios
+cordova platform add ios@8
+cordova prepare ios
+```
+
+A clean build may be necessary after changing the platform or plugin version.
 
 ### Should I use Apple’s ATT prompt?
 

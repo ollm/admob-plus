@@ -24,6 +24,7 @@
   "homepage": "https://admob-plus.github.io/docs/cordova/consent",
   "funding": "https://admob-plus.github.io/funding",
   "files": [
+    "Package.swift",
     "*.json",
     "*.md",
     "*.xml",

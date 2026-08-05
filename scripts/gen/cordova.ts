@@ -21,19 +21,6 @@ async function androidLatestVersion() {
   return result.metadata.versioning[0].latest[0];
 }
 
-async function iosLatestVersion() {
-  const res = await fetch(
-    "https://trunk.cocoapods.org/api/v1/pods/Google-Mobile-Ads-SDK",
-  );
-  const data: {
-    versions: Array<{ name: string; created_at: string }>;
-  } = await res.json();
-  data.versions.sort(
-    (a, b) => Date.parse(b.created_at) - Date.parse(a.created_at),
-  );
-  return data.versions[0].name;
-}
-
 class Generator {
   constructor(private ctx: Context) {}
 
@@ -85,24 +72,16 @@ require('cordova/exec/proxy').add('AdMob', AdMob);
     const pluginXML = await fse.readFile(filename, "utf8");
 
     const m = pluginXML.match(
-      /(PLAY_SERVICES_VERSION" default=")([\d.]+)("[\s\S]*<config-file target="\*-Info.plist" parent="SKAdNetworkItems">\s)([\s\S]+?)(\s+<\/config-file>[\s\S]+Google-Mobile-Ads-SDK" spec="~> )([\d.]+)(")/,
+      /(PLAY_SERVICES_VERSION" default=")([\d.]+)("[\s\S]*<config-file target="\*-Info.plist" parent="SKAdNetworkItems">\s)([\s\S]+?)(\s+<\/config-file>)/,
     );
     if (!m) throw new Error("Can not parse plugin.xml");
-    const [m0, m1, _androidVersion, m3, _items, m5, _iosVersion, m7] = m;
+    const [m0, m1, _androidVersion, m3, _items, m5] = m;
     const latestItems = xmlFormat(this.ctx.adNetworkItems, {
       collapseContent: true,
       lineSeparator: "\n",
     }).replace(/^/gm, "            ");
 
-    const s = [
-      m1,
-      await androidLatestVersion(),
-      m3,
-      latestItems,
-      m5,
-      await iosLatestVersion(),
-      m7,
-    ].join("");
+    const s = [m1, await androidLatestVersion(), m3, latestItems, m5].join("");
 
     return {
       filename,

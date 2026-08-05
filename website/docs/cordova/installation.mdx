@@ -96,7 +96,7 @@ Set `deployment-target` and `SwiftVersion`,
 
 Run `cordova platform remove ios` then `cordova platform add ios` to take effect.
 
-Run `pod repo update` or `cd platforms/ios && pod install --repo-update` to ensure latest SDK is ready.
+Cordova iOS 8 installs the Google Mobile Ads SDK through Swift Package Manager. The plugin declares the package in `Package.swift`, so no CocoaPods installation or repository update is required.
 
   </TabItem>
 </Tabs>

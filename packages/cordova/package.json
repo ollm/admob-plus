@@ -25,6 +25,7 @@
   "homepage": "https://admob-plus.github.io/docs/cordova",
   "funding": "https://admob-plus.github.io/funding",
   "files": [
+    "Package.swift",
     "*.ts",
     "*.md",
     "*.xml",

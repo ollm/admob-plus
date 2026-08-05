@@ -15,16 +15,16 @@ Kotlin support is required for V2, make sure your project is enabled it.
 </platform>
 ```
 
-### Require iOS 12.0 or higher
+### Require iOS 13.0 or higher
 
 The latest iOS SDK prerequisites,
 
 - Use Xcode 15.1 or higher
-- Target iOS 12.0 or higher
+- Target iOS 13.0 or higher
 
 ```xml title="config.xml" {2}
 <platform name="ios">
-    <preference name="deployment-target" value="12.0" />
+    <preference name="deployment-target" value="13.0" />
 </platform>
 ```
 
