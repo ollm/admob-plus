@@ -1,3 +1,5 @@
+import Cordova
+
 @objc(AdMobNativePlugin)
 class AdMobNativePlugin: CDVPlugin {
     override func pluginInitialize() {
