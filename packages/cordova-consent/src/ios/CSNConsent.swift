@@ -146,6 +146,7 @@ class CSNConsent: CDVPlugin {
     func emit(eventType: String, data: Any = NSNull()) {
         let result: CDVPluginResult? = CDVPluginResult(status: .ok, messageAs: ["type": eventType, "data": data])
         result?.setKeepCallbackAs(true)
+        guard let result else { return }
         self.commandDelegate.send(result, callbackId: readyCallbackId)
     }
 }

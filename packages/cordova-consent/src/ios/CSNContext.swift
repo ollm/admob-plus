@@ -83,6 +83,7 @@ class CSNContext {
     }
 
     func sendResult(_ message: CDVPluginResult?) {
+        guard let message else { return }
         self.commandDelegate.send(message, callbackId: command.callbackId)
     }
 
@@ -111,7 +112,7 @@ class CSNContext {
     }
 
     func error(_ message: String?) {
-        self.sendResult(CDVPluginResult(status: .error, messageAs: message))
+        self.sendResult(CDVPluginResult(status: .error, messageAs: message ?? ""))
     }
 
     func error(_ message: Error?) {
