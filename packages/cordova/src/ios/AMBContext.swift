@@ -1,3 +1,4 @@
+import Cordova
 import GoogleMobileAds
 
 class AMBContext: AMBCoreContext {
@@ -165,6 +166,7 @@ class AMBContext: AMBCoreContext {
     }
 
     func sendResult(_ message: CDVPluginResult?) {
+        guard let message else { return }
         self.commandDelegate.send(message, callbackId: command.callbackId)
     }
 }

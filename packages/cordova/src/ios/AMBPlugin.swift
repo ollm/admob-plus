@@ -1,6 +1,7 @@
 #if canImport(AppTrackingTransparency)
     import AppTrackingTransparency
 #endif
+import Cordova
 import GoogleMobileAds
 import WebKit
 
@@ -187,6 +188,7 @@ class AMBPlugin: CDVPlugin {
     func emit(_ eventName: String, data: Any = NSNull()) {
         let result: CDVPluginResult? = CDVPluginResult(status: .ok, messageAs: ["type": eventName, "data": data])
         result?.setKeepCallbackAs(true)
+        guard let result else { return }
         self.commandDelegate.send(result, callbackId: readyCallbackId)
     }
 }
