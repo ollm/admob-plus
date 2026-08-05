@@ -1,10 +1,10 @@
 import GoogleMobileAds
 
 class AMNAdViewProvider: NSObject, AMBNativeAdViewProvider {
-    func createView(_ ad: GADNativeAd) -> UIView {
+    func createView(_ ad: NativeAd) -> UIView {
         let nativeAd = ad
         let nibView = Bundle.main.loadNibNamed("AMNAdView", owner: nil, options: nil)?.first
-        guard let nativeAdView = nibView as? GADNativeAdView else {
+        guard let nativeAdView = nibView as? NativeAdView else {
             fatalError("cannot load AMNAdView")
         }
 

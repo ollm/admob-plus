@@ -121,8 +121,4 @@ class AMBNativeAd: AMBAdBase, NativeAdLoaderDelegate, NativeAdDelegate {
         self.emit(AMBEvents.adDismiss, nativeAd)
     }
 
-    func nativeAdWillLeaveApplication(_ nativeAd: NativeAd) {
-        // The native ad will cause the application to become inactive and
-        // open a new application.
-    }
 }

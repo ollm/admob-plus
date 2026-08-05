@@ -30,7 +30,7 @@ class AMBRewardedInterstitial: AMBAdBase, FullScreenContentDelegate {
     }
 
     override func show(_ ctx: AMBContext) {
-        self.rewardedAd?.present(fromRootViewController: AMBContext.rootViewController, userDidEarnRewardHandler: {
+        self.rewardedAd?.present(from: AMBContext.rootViewController, userDidEarnRewardHandler: {
             self.emit(AMBEvents.rewardedInterstitialReward, self.rewardedAd!.adReward)
         })
         ctx.resolve()

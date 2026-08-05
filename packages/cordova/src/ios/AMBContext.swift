@@ -129,11 +129,11 @@ class AMBContext: AMBCoreContext {
                 } else {
                     switch adSizeDict["orientation"] as? String {
                     case "portrait":
-                        return portraitLargeAnchoredAdaptiveBanner(width: width)
+                        return portraitAnchoredAdaptiveBanner(width: width)
                     case "landscape":
-                        return landscapeLargeAnchoredAdaptiveBanner(width: width)
+                        return landscapeAnchoredAdaptiveBanner(width: width)
                     default:
-                        return currentOrientationLargeAnchoredAdaptiveBanner(width: width)
+                        return currentOrientationAnchoredAdaptiveBanner(width: width)
                     }
                 }
             } else if let width = adSizeDict["width"] as? Int,

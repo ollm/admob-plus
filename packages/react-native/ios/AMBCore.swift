@@ -110,13 +110,13 @@ extension AMBCoreContext {
     func optMaxAdContentRating() -> MaxAdContentRating? {
         switch optString("maxAdContentRating") {
         case "G":
-            return MaxAdContentRating.general
+            return .general
         case "MA":
-            return MaxAdContentRating.matureAudience
+            return .matureAudience
         case "PG":
-            return MaxAdContentRating.parentalGuidance
+            return .parentalGuidance
         case "T":
-            return MaxAdContentRating.teen
+            return .teen
         default:
             return nil
         }
@@ -178,11 +178,11 @@ extension AMBCoreContext {
         if let maxAdContentRating = optMaxAdContentRating() {
             requestConfiguration.maxAdContentRating = maxAdContentRating
         }
-        if optChildDirectedTreatmentTag() != nil {
-            requestConfiguration.ageRestrictedTreatment = .tagForChildDirectedTreatment
+        if let tag = optChildDirectedTreatmentTag() {
+            requestConfiguration.tagForChildDirectedTreatment = tag
         }
-        if optUnderAgeOfConsentTag() != nil {
-            requestConfiguration.ageRestrictedTreatment = .tagForUnderAgeOfConsent
+        if let tag = optUnderAgeOfConsentTag() {
+            requestConfiguration.tagForUnderAgeOfConsent = tag
         }
         if let testDevices = optTestDeviceIds() {
             requestConfiguration.testDeviceIdentifiers = testDevices

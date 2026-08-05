@@ -183,10 +183,10 @@ extension AMBCoreContext {
             requestConfiguration.maxAdContentRating = maxAdContentRating
         }
         if let tag = optChildDirectedTreatmentTag() {
-            requestConfiguration.ageRestrictedTreatment = .tagForChildDirectedTreatment
+            requestConfiguration.tagForChildDirectedTreatment = tag
         }
         if let tag = optUnderAgeOfConsentTag() {
-            requestConfiguration.ageRestrictedTreatment = .tagForUnderAgeOfConsent
+            requestConfiguration.tagForUnderAgeOfConsent = tag
         }
         if let testDevices = optTestDeviceIds() {
             requestConfiguration.testDeviceIdentifiers = testDevices
