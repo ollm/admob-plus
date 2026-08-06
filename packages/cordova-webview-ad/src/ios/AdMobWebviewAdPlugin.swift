@@ -24,7 +24,7 @@ class AdMobWebviewAdPlugin: CDVPlugin, CDVPluginNavigationHandler {
         }
     }
 
-    @objc func shouldOverrideLoadWithRequest(_ request: URLRequest, navigationType: CDVWebViewNavigationType, info: [AnyHashable: Any]) -> Bool {
+    @objc func shouldOverrideLoad(with request: URLRequest, navigationType: CDVWebViewNavigationType, info: [AnyHashable: Any]) -> Bool {
         var allowNavigationsPass = true
 
         if overrideUrlLoading {
