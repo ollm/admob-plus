@@ -38,26 +38,25 @@ class AdMobWebviewAdPlugin: CDVPlugin, CDVPluginNavigationHandler {
             return allowNavigationsPass
         }
 
-        NSLog("[AdMobWebViewAd] Navigation request: url=\(url.absoluteString), type=\(navigationType), override=\(overrideUrlLoading)")
+        let webView = self.webViewEngine.engineWebView as? WKWebView
+        let currentURL = webView?.url
+        let isCurrentURL = currentURL == nil || currentURL == url
+        let sourceFrame = info["sourceFrame"] as? WKFrameInfo
+        let targetFrame = info["targetFrame"] as? WKFrameInfo
+        let isNewWindowNavigation = targetFrame == nil
+        let isMainFrameNavigation = targetFrame?.isMainFrame ?? (sourceFrame?.isMainFrame ?? true)
+        let infoKeys = info.keys.map { String(describing: $0) }.sorted().joined(separator: ",")
+
+        NSLog("[AdMobWebViewAd] Navigation request: url=\(url.absoluteString), type=\(navigationType), override=\(overrideUrlLoading), current=\(currentURL?.absoluteString ?? \"nil\"), mainFrame=\(isMainFrameNavigation), newWindow=\(isNewWindowNavigation), infoKeys=\(infoKeys)")
 
         if overrideUrlLoading {
             if url.scheme == "http" || url.scheme == "https" {
-                let webView = self.webViewEngine.engineWebView as? WKWebView
-                let isInitialOrCurrentPage = webView?.url == nil || webView?.url == url
+                // Ad clicks can arrive as WKNavigationType.other from an iframe.
+                // Any HTTP(S) navigation to a different URL should leave the app.
+                allowNavigationsPass = isCurrentURL || (!isMainFrameNavigation && !isNewWindowNavigation)
 
-                if info["sourceFrame"] == nil && !isInitialOrCurrentPage {
+                if navigationType == CDVWebViewNavigationType(WKNavigationType.linkActivated.rawValue) {
                     allowNavigationsPass = false
-                }
-
-                switch navigationType {
-                case CDVWebViewNavigationType(WKNavigationType.linkActivated.rawValue):
-                    allowNavigationsPass = false
-                case CDVWebViewNavigationType(WKNavigationType.other.rawValue):
-                    if url.absoluteString.range(of: "utm_content") != nil {
-                        allowNavigationsPass = false
-                    }
-                default:
-                    break
                 }
 
                 // Allow webviewGoto urls to pass
