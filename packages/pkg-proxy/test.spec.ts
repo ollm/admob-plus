@@ -1,15 +1,15 @@
-import assert from 'node:assert';
-import {expect, test} from 'vitest';
-import {findPkg} from '.';
+import assert from "node:assert";
+import { expect, test } from "vitest";
+import { findPkg } from "./src/index.js";
 
-test('pkg-proxy', async () => {
+test("pkg-proxy", async () => {
   const pkg = await findPkg();
-  expect(pkg?.name).toBe('admob-plus-monorepo');
+  expect(pkg?.name).toBe("admob-plus-monorepo");
   assert(pkg);
 
   const json = JSON.stringify(pkg);
   expect(json).toBe(JSON.stringify(pkg.json));
 
-  Object.assign(pkg, {newprop: 'newprop'});
+  Object.assign(pkg, { newprop: "newprop" });
   expect(JSON.stringify(pkg)).not.toBe(json);
 });
