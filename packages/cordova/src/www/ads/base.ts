@@ -43,7 +43,10 @@ export class MobileAd<T extends MobileAdOptions = MobileAdOptions> {
 
   public on(...args: Parameters<typeof document.addEventListener>): () => void {
     const [eventName, cb, ...rest] = args;
-    const type = `admob.ad.${eventName.toLowerCase()}`;
+    const type =
+      eventName.toLowerCase() === "size"
+        ? "admob.banner.size"
+        : `admob.ad.${eventName.toLowerCase()}`;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     const listener = (evt: any) => {

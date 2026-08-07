@@ -111,6 +111,11 @@ class Banner(ctx: ExecuteContext) : AdBase(ctx) {
     override fun show(ctx: ExecuteContext) {
         if (mAdView!!.parent == null) {
             addBannerView()
+            mAdView!!.post {
+                if (mAdView!!.width > 0 && mAdView!!.height > 0) {
+                    emit(Events.BANNER_SIZE, computeAdSize())
+                }
+            }
         } else if (mAdView!!.visibility == View.GONE) {
             mAdView!!.visibility = View.VISIBLE
         } else {

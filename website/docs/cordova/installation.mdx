@@ -16,20 +16,6 @@ Or via [Cordova CLI](https://www.npmjs.com/package/cordova):
 cordova plugin add admob-plus-cordova --save --variable APP_ID_ANDROID=ca-app-pub-xxx~xxx --variable APP_ID_IOS=ca-app-pub-xxx~xxx
 ```
 
-`APP_ID_ANDROID` is required when using the GMA Next-Gen SDK. Unlike the legacy
-Google Mobile Ads SDK, GMA Next-Gen does not read the AdMob app ID automatically
-from the Android manifest during initialization. AdMob Plus passes this value to
-`InitializationConfig`, so replace the placeholder with your Android AdMob app ID.
-
-If you configure the plugin in `config.xml`, use the same value:
-
-```xml
-<preference name="APP_ID_ANDROID" value="ca-app-pub-xxxxxxxxxxxxxxxx~xxxxxxxxxx" />
-```
-
-The app ID is also required in any custom Android `MainActivity.java` used to
-register the WebView before loading the Cordova URL.
-
 ### Local development
 
 Use Node.js 20 or newer, then build the plugin from the monorepo:
