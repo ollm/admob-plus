@@ -12,8 +12,6 @@ class AdMobWebviewAdPlugin: CDVPlugin, CDVPluginNavigationHandler {
     override func pluginInitialize() {
         super.pluginInitialize()
 
-        NSLog("[AdMobWebViewAd] Initialize plugin")
-
         if let x = self.commandDelegate.settings["AdMobPlusWebViewAd".lowercased()] as? String,
            x == "true" {
             let webView = self.webViewEngine.engineWebView as! WKWebView
@@ -34,7 +32,6 @@ class AdMobWebviewAdPlugin: CDVPlugin, CDVPluginNavigationHandler {
         var allowNavigationsPass = true
 
         guard let url = request.url else {
-            NSLog("[AdMobWebViewAd] Navigation request has no URL")
             return allowNavigationsPass
         }
 
@@ -45,9 +42,6 @@ class AdMobWebviewAdPlugin: CDVPlugin, CDVPluginNavigationHandler {
         let targetFrame = info["targetFrame"] as? WKFrameInfo
         let isNewWindowNavigation = targetFrame == nil
         let isMainFrameNavigation = targetFrame?.isMainFrame ?? (sourceFrame?.isMainFrame ?? true)
-        let infoKeys = info.keys.map { String(describing: $0) }.sorted().joined(separator: ",")
-
-        NSLog("%@", "[AdMobWebViewAd] Navigation request: url=\(url.absoluteString), type=\(navigationType), override=\(overrideUrlLoading), current=\(currentURL?.absoluteString ?? "nil"), mainFrame=\(isMainFrameNavigation), newWindow=\(isNewWindowNavigation), infoKeys=\(infoKeys)")
 
         if overrideUrlLoading {
             if url.scheme == "http" || url.scheme == "https" {
@@ -76,11 +70,7 @@ class AdMobWebviewAdPlugin: CDVPlugin, CDVPluginNavigationHandler {
                             NSLog("%@", "[AdMobWebViewAd] External URL open result: \(success), url=\(url.absoluteString)")
                         }
                     }
-                } else {
-                    NSLog("%@", "[AdMobWebViewAd] Allowing URL in WebView: \(url.absoluteString)")
                 }
-            } else {
-                NSLog("%@", "[AdMobWebViewAd] Non HTTP(S) URL passed to WebView: \(url.absoluteString)")
             }
         }
 
