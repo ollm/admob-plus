@@ -55,12 +55,12 @@ public class AdMobPlusPlugin: CAPPlugin, AMBHelperAdapter {
             requestConfiguration.maxAdContentRating = maxAdContentRating
         }
 
-        if ctx.optChildDirectedTreatmentTag() != nil {
-            requestConfiguration.ageRestrictedTreatment = .tagForChildDirectedTreatment
+        if let tag = ctx.optChildDirectedTreatmentTag() {
+            requestConfiguration.tagForChildDirectedTreatment = tag
         }
 
-        if ctx.optUnderAgeOfConsentTag() != nil {
-            requestConfiguration.ageRestrictedTreatment = .tagForUnderAgeOfConsent
+        if let tag = ctx.optUnderAgeOfConsentTag() {
+            requestConfiguration.tagForUnderAgeOfConsent = tag
         }
 
         if let testDevices = ctx.optTestDeviceIds() {

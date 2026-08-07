@@ -31,7 +31,7 @@ class AMBRewarded: AMBAdBase, FullScreenContentDelegate {
 
     override func show(_ ctx: AMBContext) {
         if self.isLoaded() {
-            self.rewardedAd?.present(fromRootViewController: AMBContext.rootViewController, userDidEarnRewardHandler: {
+            self.rewardedAd?.present(from: AMBContext.rootViewController, userDidEarnRewardHandler: {
                 self.emit(AMBEvents.rewardedReward, self.rewardedAd!.adReward)
             })
             ctx.resolve()

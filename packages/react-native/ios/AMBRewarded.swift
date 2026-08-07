@@ -32,7 +32,7 @@ class AMBRewarded: AMBAdBase, FullScreenContentDelegate {
     }
 
     override func show(_ ctx: AMBContext) {
-        ad?.present(fromRootViewController: rootViewController, userDidEarnRewardHandler: {
+            ad?.present(from: rootViewController, userDidEarnRewardHandler: {
             let reward = self.ad!.adReward
             self.emit(AMBEvents.adReward, reward)
         })

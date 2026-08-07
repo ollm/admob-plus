@@ -14,7 +14,7 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/apache/cordova-ios.git",
-            branch: "master"
+            .branch("master")
         ),
         .package(
             name: "GoogleMobileAds",

@@ -34,7 +34,7 @@ class AMBInterstitial: AMBAdBase, FullScreenContentDelegate {
     }
 
     override func show(_ ctx: AMBContext) {
-        ad?.present(fromRootViewController: self.rootViewController)
+        ad?.present(from: self.rootViewController)
         ctx.resolve()
     }
 

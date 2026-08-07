@@ -1,3 +1,4 @@
+import Cordova
 import GoogleMobileAds
 
 class AMBContext: AMBCoreContext {
@@ -128,11 +129,11 @@ class AMBContext: AMBCoreContext {
                 } else {
                     switch adSizeDict["orientation"] as? String {
                     case "portrait":
-                        return portraitLargeAnchoredAdaptiveBanner(width: width)
+                        return portraitAnchoredAdaptiveBanner(width: width)
                     case "landscape":
-                        return landscapeLargeAnchoredAdaptiveBanner(width: width)
+                        return landscapeAnchoredAdaptiveBanner(width: width)
                     default:
-                        return currentOrientationLargeAnchoredAdaptiveBanner(width: width)
+                        return currentOrientationAnchoredAdaptiveBanner(width: width)
                     }
                 }
             } else if let width = adSizeDict["width"] as? Int,
@@ -165,6 +166,7 @@ class AMBContext: AMBCoreContext {
     }
 
     func sendResult(_ message: CDVPluginResult?) {
+        guard let message else { return }
         self.commandDelegate.send(message, callbackId: command.callbackId)
     }
 }

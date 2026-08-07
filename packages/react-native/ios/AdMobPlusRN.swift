@@ -49,11 +49,11 @@ class AdMobPlusRN: RCTEventEmitter {
         }
 
         if let tag = ctx.optChildDirectedTreatmentTag() {
-            requestConfiguration.ageRestrictedTreatment = .tagForChildDirectedTreatment
+            requestConfiguration.tagForChildDirectedTreatment = tag
         }
 
         if let tag = ctx.optUnderAgeOfConsentTag() {
-            requestConfiguration.ageRestrictedTreatment = .tagForUnderAgeOfConsent
+            requestConfiguration.tagForUnderAgeOfConsent = tag
         }
 
         if let testDevices = ctx.optTestDeviceIds() {
