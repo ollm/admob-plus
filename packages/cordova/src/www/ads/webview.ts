@@ -12,7 +12,7 @@ export class WebViewAd extends MobileAd<WebViewAdOptions> {
 
   static async checkIntegration() {
     await execAsync("webviewGoto", [
-      "https://google.github.io/webview-ads/test/#api-for-ads-tests",
+      "https://google.github.io/webview-ads/test/",
     ]);
   }
 
