@@ -38,7 +38,7 @@ class AdMobWebviewAdPlugin: CDVPlugin, CDVPluginNavigationHandler {
             return allowNavigationsPass
         }
 
-        NSLog("[AdMobWebViewAd] Navigation request: url=\(url.absoluteString), type=\(navigationType.rawValue), override=\(overrideUrlLoading)")
+        NSLog("[AdMobWebViewAd] Navigation request: url=\(url.absoluteString), type=\(navigationType), override=\(overrideUrlLoading)")
 
         if overrideUrlLoading {
             if url.scheme == "http" || url.scheme == "https" {
