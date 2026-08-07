@@ -1,0 +1,55 @@
+{
+  "name": "@admob-plus/ionic",
+  "version": "2.0.0-alpha.19",
+  "description": "Ionic Native wrapper for admob-plus-cordova",
+  "main": "./cjs/index.js",
+  "module": "index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "prepublishOnly": "turbo run build",
+    "build": "tsx scripts/build.ts",
+    "test": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@ionic-native/core": ">=4",
+    "admob-plus-cordova": ">=1.0.0",
+    "rxjs": ">=5.5.0"
+  },
+  "devDependencies": {
+    "@angular/core": "~17.2.3",
+    "@ionic-native/core": "^5.36.0",
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^20.12.5",
+    "admob-plus-cordova": "*",
+    "del": "^6.1.1",
+    "execa": "^5.1.1",
+    "fs-extra": "^11.2.0",
+    "rxjs": "^7.8.1",
+    "tsx": "^4.7.2",
+    "typescript": "~5.3.3"
+  },
+  "author": "Ratson",
+  "license": "MIT",
+  "repository": "admob-plus/admob-plus",
+  "homepage": "https://admob-plus.github.io/docs/ionic",
+  "funding": "https://admob-plus.github.io/funding",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "*.ts",
+    "*.md",
+    "lib",
+    "ngx",
+    "src"
+  ],
+  "keywords": [
+    "ionic",
+    "native",
+    "admob",
+    "monetization",
+    "cordova",
+    "phonegap",
+    "typescript"
+  ]
+}

@@ -6,7 +6,6 @@
   "types": "./esm/index.d.ts",
   "module": "./esm/index.js",
   "scripts": {
-    "prepare": "turbo run build",
     "version": "cordova-plus plugin version",
     "build": "cordova-plus plugin build --input=./src/www/consent.ts --lib --esm",
     "test": "cordova-plus plugin test"
