@@ -47,7 +47,7 @@ class AdMobWebviewAdPlugin: CDVPlugin, CDVPluginNavigationHandler {
         let isMainFrameNavigation = targetFrame?.isMainFrame ?? (sourceFrame?.isMainFrame ?? true)
         let infoKeys = info.keys.map { String(describing: $0) }.sorted().joined(separator: ",")
 
-        NSLog("[AdMobWebViewAd] Navigation request: url=\(url.absoluteString), type=\(navigationType), override=\(overrideUrlLoading), current=\(currentURL?.absoluteString ?? \"nil\"), mainFrame=\(isMainFrameNavigation), newWindow=\(isNewWindowNavigation), infoKeys=\(infoKeys)")
+        NSLog("[AdMobWebViewAd] Navigation request: url=\(url.absoluteString), type=\(navigationType), override=\(overrideUrlLoading), current=\(currentURL?.absoluteString ?? "nil"), mainFrame=\(isMainFrameNavigation), newWindow=\(isNewWindowNavigation), infoKeys=\(infoKeys)")
 
         if overrideUrlLoading {
             if url.scheme == "http" || url.scheme == "https" {
