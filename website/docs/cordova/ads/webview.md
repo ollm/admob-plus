@@ -9,7 +9,7 @@ This feature requires careful handling about how your app is loading and present
 
 :::
 
-WebView Ad is the integration of [WebView API for Ads](https://developers.google.com/admob/android/webview) for [Android](https://developers.google.com/admob/android/webview) and [iOS](https://developers.google.com/admob/ios/webview) in the Cordova WebView, with this ads you can show AdSense ads in your app.
+WebView Ad is the integration of [WebView API for Ads](https://developers.google.com/admob/android/next-gen/browser/webview/api-for-ads) for [Android](https://developers.google.com/admob/android/next-gen/browser/webview) and [iOS](https://developers.google.com/admob/ios/webview) in the Cordova WebView, with this ads you can show AdSense ads in your app.
 
 In addtion to installing `admob-plus-cordova`, you will need to install `admob-plus-cordova-webview-ad` for displaying WebView ads.
 
@@ -47,15 +47,22 @@ It is also necessary to add your AdSense domain as `Hostname` of the CordovaWebV
 <preference name="AdMobPlusOverrideUrlLoading" value="true" />
 ```
 
-If ads are not displayed correctly (Probably on iOS), you may also need to add the following config to your `config.xml`
+If ads are not displayed correctly on iOS, you may also need to add the following
+config to the iOS platform section of your `config.xml`. Do not use
+`<allow-navigation href="*" />` on Android when external ad clicks should open in
+the browser, because it forces every HTTP/HTTPS destination to remain in the WebView.
 
 ```xml
-<allow-navigation href="*" />
+<platform name="ios">
+  <allow-navigation href="*" />
+</platform>
 ```
 
 ### Performance issue (Only Android)
 
-In order for the ads to show, the WebView needs to be registered with the AdMob SDK using `MobileAds.registerWebView(webView)`, this has to be done before the URL is set to the WebView (https://developers.google.com/admob/android/webview#register_the_webview), for my part, I have not managed to do it before cordova does it, so for it to work I had to reload the WebView with `WebView.reload()`, this affects the time of loading of the app, but I don't know if it is appreciable, it is possible to avoid this by registering the WebView in the `MainActivity.java`, how to do it below.
+In order for the ads to show, the WebView needs to be registered with the GMA Next-Gen SDK using `MobileAds.registerWebView(webView)`. Registration must happen on the main thread and before the URL is loaded ([official documentation](https://developers.google.com/admob/android/next-gen/browser/webview/api-for-ads)). The Cordova plugin registers the WebView automatically, but it must reload the WebView because Cordova loads the URL before the plugin is initialized. This can delay the first load.
+
+You can avoid that reload by registering the WebView in `MainActivity.java` before calling `loadUrl(launchUrl)`, as shown below.
 
 Any solution to this without changing the `MainActivity.java` is welcome.
 
@@ -71,12 +78,15 @@ import android.os.Bundle;
 import android.util.Log;
 import android.webkit.WebView;
 
-import com.google.android.gms.ads.MobileAds;
+import com.google.android.libraries.ads.mobile.sdk.MobileAds;
+import com.google.android.libraries.ads.mobile.sdk.initialization.InitializationConfig;
 
 import org.apache.cordova.*;
 
 public class MainActivity extends CordovaActivity
 {
+  private static final String ADMOB_APP_ID = "YOUR_ADMOB_APP_ID";
+
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -88,25 +98,29 @@ public class MainActivity extends CordovaActivity
             moveTaskToBack(true);
         }
 
-        loadUrl(launchUrl);
+        super.init();
 
-        final CordovaActivity me = this;
-        // highlight-start
-        me.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                WebView webView = (WebView) appView.getView();
-                MobileAds.registerWebView(webView);
-                Log.d("AdMobPlus", "Integrated the WebView API for Ads in "+webView.getUrl()+" WebView from MainActivity");
+        MobileAds.initialize(
+          this,
+          new InitializationConfig.Builder(ADMOB_APP_ID).build(),
+          status -> {
+            runOnUiThread(() -> {
+              WebView webView = (WebView) appView.getView();
+              MobileAds.registerWebView(webView);
+              Log.d("AdMobWebviewAd", "Integrated the WebView API for Ads in "
+                + webView.getUrl() + " WebView from MainActivity");
+              loadUrl(launchUrl);
+            });
             }
-        });
-        // highlight-end
+        );
     }
 }
 
 ```
 
-Change `app.package.name` to you app name.
+Change `app.package.name` to your app's package name.
+
+Change `YOUR_ADMOB_APP_ID` to your AdMob app ID.
 
 Remove this from `config.xml` or change to `false` (If you also use the WebView API for Ads on iOS, move it to `<platform  name="ios">` and set to `true`)
 ```xml
@@ -162,6 +176,8 @@ document.addEventListener('deviceready', async () => {
     adsense: 'ca-pub-xxx', // Your adsense account
     npa: nonPersonalizedAds ? '1' : '',
   });
+
+  loadUrl(launchUrl);
 
   // Load ads here
 }, false)

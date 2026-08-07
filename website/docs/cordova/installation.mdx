@@ -16,6 +16,20 @@ Or via [Cordova CLI](https://www.npmjs.com/package/cordova):
 cordova plugin add admob-plus-cordova --save --variable APP_ID_ANDROID=ca-app-pub-xxx~xxx --variable APP_ID_IOS=ca-app-pub-xxx~xxx
 ```
 
+`APP_ID_ANDROID` is required when using the GMA Next-Gen SDK. Unlike the legacy
+Google Mobile Ads SDK, GMA Next-Gen does not read the AdMob app ID automatically
+from the Android manifest during initialization. AdMob Plus passes this value to
+`InitializationConfig`, so replace the placeholder with your Android AdMob app ID.
+
+If you configure the plugin in `config.xml`, use the same value:
+
+```xml
+<preference name="APP_ID_ANDROID" value="ca-app-pub-xxxxxxxxxxxxxxxx~xxxxxxxxxx" />
+```
+
+The app ID is also required in any custom Android `MainActivity.java` used to
+register the WebView before loading the Cordova URL.
+
 ### Local development
 
 Use Node.js 20 or newer, then build the plugin from the monorepo:
@@ -38,8 +52,8 @@ cordova prepare android
 cordova build android
 ```
 
-The local package uses `play-services-ads:25.4.0` by default. To override it for a specific
-application, pass `--variable PLAY_SERVICES_VERSION=25.4.0` when adding the plugin.
+The local package uses `ads-mobile-sdk:1.3.1` by default. To override it for a specific
+application, pass `--variable GMA_NEXT_GEN_VERSION=1.3.1` when adding the plugin.
 
 <Tabs
   defaultValue="android"
@@ -49,8 +63,8 @@ application, pass `--variable PLAY_SERVICES_VERSION=25.4.0` when adding the plug
   ]}>
   <TabItem value="android">
 
-`com.google.android.gms:play-services-ads:$PLAY_SERVICES_VERSION` is available for configuration,
-the default is `--PLAY_SERVICES_VERSION=25.4.0`.
+`com.google.android.libraries.ads.mobile.sdk:ads-mobile-sdk:$GMA_NEXT_GEN_VERSION` is available for configuration,
+the default is `--GMA_NEXT_GEN_VERSION=1.3.1`.
 
 When using with other plugins and encountering errors, set `AndroidXEnabled` to `true`.
 

@@ -4,12 +4,12 @@ import admob.plus.capacitor.ExecuteContext
 import admob.plus.capacitor.Generated
 import admob.plus.core.Context
 import admob.plus.core.GenericAd
-import com.google.android.gms.ads.AdError
-import com.google.android.gms.ads.FullScreenContentCallback
-import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.rewarded.RewardItem
-import com.google.android.gms.ads.rewarded.RewardedAd
-import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
+import com.google.android.libraries.ads.mobile.sdk.common.AdLoadCallback
+import com.google.android.libraries.ads.mobile.sdk.common.FullScreenContentError
+import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
+import com.google.android.libraries.ads.mobile.sdk.rewarded.OnUserEarnedRewardListener
+import com.google.android.libraries.ads.mobile.sdk.rewarded.RewardedAd
+import com.google.android.libraries.ads.mobile.sdk.rewarded.RewardedAdEventCallback
 
 class Rewarded(ctx: ExecuteContext?) : AdBase(ctx), GenericAd {
     private var mAd: RewardedAd? = null
@@ -21,10 +21,8 @@ class Rewarded(ctx: ExecuteContext?) : AdBase(ctx), GenericAd {
     override fun load(ctx: Context?) {
         clear()
         RewardedAd.load(
-            activity,
-            adUnitId,
             ctx!!.optAdRequest(),
-            object : RewardedAdLoadCallback() {
+            object : AdLoadCallback<RewardedAd> {
                 override fun onAdFailedToLoad(loadAdError: LoadAdError) {
                     clear()
                     emit(Generated.Events.REWARDED_LOAD_FAIL, loadAdError)
@@ -37,13 +35,13 @@ class Rewarded(ctx: ExecuteContext?) : AdBase(ctx), GenericAd {
                     if (ssv != null) {
                         mAd!!.setServerSideVerificationOptions(ssv)
                     }
-                    mAd!!.fullScreenContentCallback = object : FullScreenContentCallback() {
+                    mAd!!.adEventCallback = object : RewardedAdEventCallback {
                         override fun onAdDismissedFullScreenContent() {
                             clear()
                             emit(Generated.Events.REWARDED_DISMISS)
                         }
 
-                        override fun onAdFailedToShowFullScreenContent(adError: AdError) {
+                        override fun onAdFailedToShowFullScreenContent(adError: FullScreenContentError) {
                             emit(Generated.Events.REWARDED_SHOW_FAIL, adError)
                         }
 
@@ -65,18 +63,17 @@ class Rewarded(ctx: ExecuteContext?) : AdBase(ctx), GenericAd {
         get() = mAd != null
 
     override fun show(ctx: Context?) {
-        mAd!!.show(activity) { rewardItem: RewardItem? ->
+        mAd!!.show(activity, OnUserEarnedRewardListener { rewardItem ->
             emit(
                 Generated.Events.REWARDED_REWARD,
                 rewardItem!!
             )
-        }
+        })
         ctx!!.resolve()
     }
 
     private fun clear() {
         if (mAd != null) {
-            mAd!!.fullScreenContentCallback = null
             mAd = null
         }
     }

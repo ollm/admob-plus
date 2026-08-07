@@ -4,7 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import android.webkit.WebView
-import com.google.android.gms.ads.MobileAds
+import com.google.android.libraries.ads.mobile.sdk.MobileAds
 import org.apache.cordova.CallbackContext
 import org.apache.cordova.CordovaInterface
 import org.apache.cordova.CordovaPlugin
@@ -21,6 +21,8 @@ class Plugin : CordovaPlugin() {
         preferences.getBoolean("AdMobPlusOverrideUrlLoading", true)
     }
 
+    @Deprecated("Required by the CordovaPlugin lifecycle")
+    @Suppress("DEPRECATION")
     override fun initialize(cordova: CordovaInterface, cordovaWebView: CordovaWebView) {
         cordova.activity.runOnUiThread {
             if (isWebviewAdEnabled) {
@@ -60,7 +62,6 @@ class Plugin : CordovaPlugin() {
             if (uri.scheme in setOf("http", "https") && url != webView.url) {
                 cordova.activity.startActivity(intent)
                 Log.d(TAG, "Open Iframe URL to browser $url")
-                //webView.sendJavascript("cordova.InAppBrowser.open('" + url + "', '_system');");
             } else {
                 return false
             }

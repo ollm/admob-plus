@@ -20,9 +20,7 @@
             </feature>
         </config-file>
 
-        <config-file target="AndroidManifest.xml" parent="/manifest/application">
-            <meta-data android:name="com.google.android.gms.ads.flag.INTEGRATION_MANAGER" android:value="webview" />
-        </config-file>
+        <framework src="com.google.android.libraries.ads.mobile.sdk:ads-mobile-sdk:1.3.1" />
 
         <source-file src="src/android/Plugin.kt" target-dir="app/src/main/kotlin/admob/plus/cordova/webviewad" />
     </platform>

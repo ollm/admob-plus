@@ -2,11 +2,11 @@ package admob.plus.rn.ads;
 
 import androidx.annotation.NonNull;
 
-import com.google.android.gms.ads.AdError;
-import com.google.android.gms.ads.FullScreenContentCallback;
-import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.interstitial.InterstitialAd;
-import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
+import com.google.android.libraries.ads.mobile.sdk.common.AdLoadCallback;
+import com.google.android.libraries.ads.mobile.sdk.common.FullScreenContentError;
+import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError;
+import com.google.android.libraries.ads.mobile.sdk.interstitial.InterstitialAd;
+import com.google.android.libraries.ads.mobile.sdk.interstitial.InterstitialAdEventCallback;
 
 import admob.plus.core.Context;
 import admob.plus.core.GenericAd;
@@ -31,12 +31,12 @@ public class Interstitial extends AdBase implements GenericAd {
     public void load(Context ctx) {
         clear();
 
-        InterstitialAd.load(getAdapter().getActivity(), adUnitId, ctx.optAdRequest(), new InterstitialAdLoadCallback() {
+        InterstitialAd.load(ctx.optAdRequest(), new AdLoadCallback<InterstitialAd>() {
             @Override
             public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
                 mAd = interstitialAd;
 
-                mAd.setFullScreenContentCallback(new FullScreenContentCallback() {
+                mAd.adEventCallback = new InterstitialAdEventCallback() {
                     @Override
                     public void onAdDismissedFullScreenContent() {
                         clear();
@@ -44,7 +44,7 @@ public class Interstitial extends AdBase implements GenericAd {
                     }
 
                     @Override
-                    public void onAdFailedToShowFullScreenContent(AdError adError) {
+                    public void onAdFailedToShowFullScreenContent(FullScreenContentError adError) {
                         clear();
                         emit(Events.AD_SHOW_FAIL, adError);
                     }
@@ -86,7 +86,7 @@ public class Interstitial extends AdBase implements GenericAd {
 
     private void clear() {
         if (mAd != null) {
-            mAd.setFullScreenContentCallback(null);
+            mAd.adEventCallback = null;
             mAd = null;
         }
     }

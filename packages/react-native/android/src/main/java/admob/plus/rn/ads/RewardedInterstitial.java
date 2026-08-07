@@ -2,12 +2,13 @@ package admob.plus.rn.ads;
 
 import androidx.annotation.NonNull;
 
-import com.google.android.gms.ads.AdError;
-import com.google.android.gms.ads.FullScreenContentCallback;
-import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.rewarded.ServerSideVerificationOptions;
-import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd;
-import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAdLoadCallback;
+import com.google.android.libraries.ads.mobile.sdk.common.AdLoadCallback;
+import com.google.android.libraries.ads.mobile.sdk.common.FullScreenContentError;
+import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError;
+import com.google.android.libraries.ads.mobile.sdk.rewarded.OnUserEarnedRewardListener;
+import com.google.android.libraries.ads.mobile.sdk.rewarded.ServerSideVerificationOptions;
+import com.google.android.libraries.ads.mobile.sdk.rewardedinterstitial.RewardedInterstitialAd;
+import com.google.android.libraries.ads.mobile.sdk.rewardedinterstitial.RewardedInterstitialAdEventCallback;
 
 import admob.plus.core.Context;
 import admob.plus.core.GenericAd;
@@ -32,7 +33,7 @@ public class RewardedInterstitial extends AdBase implements GenericAd {
     public void load(Context ctx) {
         clear();
 
-        RewardedInterstitialAd.load(getAdapter().getActivity(), adUnitId, ctx.optAdRequest(), new RewardedInterstitialAdLoadCallback() {
+        RewardedInterstitialAd.load(ctx.optAdRequest(), new AdLoadCallback<RewardedInterstitialAd>() {
             @Override
             public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                 emit(Events.AD_LOAD_FAIL, loadAdError);
@@ -46,7 +47,7 @@ public class RewardedInterstitial extends AdBase implements GenericAd {
                 if (ssv != null) {
                     mAd.setServerSideVerificationOptions(ssv);
                 }
-                mAd.setFullScreenContentCallback(new FullScreenContentCallback() {
+                mAd.adEventCallback = new RewardedInterstitialAdEventCallback() {
                     @Override
                     public void onAdDismissedFullScreenContent() {
                         clear();
@@ -54,7 +55,7 @@ public class RewardedInterstitial extends AdBase implements GenericAd {
                     }
 
                     @Override
-                    public void onAdFailedToShowFullScreenContent(AdError adError) {
+                    public void onAdFailedToShowFullScreenContent(FullScreenContentError adError) {
                         clear();
                         emit(Events.AD_SHOW_FAIL, adError);
                     }
@@ -83,7 +84,7 @@ public class RewardedInterstitial extends AdBase implements GenericAd {
 
     @Override
     public void show(Context ctx) {
-        mAd.show(getAdapter().getActivity(), rewardItem -> {
+        mAd.show(getAdapter().getActivity(), (OnUserEarnedRewardListener) rewardItem -> {
             emit(Events.AD_REWARD, rewardItem);
         });
         ctx.resolve();

@@ -13,7 +13,7 @@ import type Context from "./context";
 
 async function androidLatestVersion() {
   const res = await fetch(
-    "https://dl.google.com/dl/android/maven2/com/google/android/gms/play-services-ads/maven-metadata.xml",
+    "https://dl.google.com/dl/android/maven2/com/google/android/libraries/ads/mobile/sdk/ads-mobile-sdk/maven-metadata.xml",
   );
   const data = await res.text();
   const result: { metadata: { versioning: Array<{ latest: [string] }> } } =
@@ -72,7 +72,7 @@ require('cordova/exec/proxy').add('AdMob', AdMob);
     const pluginXML = await fse.readFile(filename, "utf8");
 
     const m = pluginXML.match(
-      /(PLAY_SERVICES_VERSION" default=")([\d.]+)("[\s\S]*<config-file target="\*-Info.plist" parent="SKAdNetworkItems">\s)([\s\S]+?)(\s+<\/config-file>)/,
+      /(GMA_NEXT_GEN_VERSION" default=")([\d.]+)("[\s\S]*<config-file target="\*-Info.plist" parent="SKAdNetworkItems">\s)([\s\S]+?)(\s+<\/config-file>)/,
     );
     if (!m) throw new Error("Can not parse plugin.xml");
     const [m0, m1, _androidVersion, m3, _items, m5] = m;

@@ -15,15 +15,10 @@
 
     <platform name="android">
         <preference name="APP_ID_ANDROID" default="ca-app-pub-xxx~yyy" />
-        <preference name="PLAY_SERVICES_VERSION" default="25.4.0" />
+        <preference name="GMA_NEXT_GEN_VERSION" default="1.3.1" />
+        <preference name="android-minSdkVersion" default="24" />
 
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
-            <activity android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" android:excludeFromRecents="true" android:name="com.google.android.gms.ads.AdActivity" android:noHistory="true" />
-            <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="$APP_ID_ANDROID" />
-            <meta-data android:name="com.google.android.gms.ads.DELAY_APP_MEASUREMENT_INIT" android:value="true"/>
-            <meta-data android:name="com.google.android.gms.ads.flag.OPTIMIZE_INITIALIZATION" android:value="true" />
-            <meta-data android:name="com.google.android.gms.ads.flag.OPTIMIZE_AD_LOADING" android:value="true" />
-            <meta-data android:name="com.google.android.gms.ads.flag.INTEGRATION_MANAGER" android:value="webview" />
         </config-file>
 
         <config-file target="res/xml/config.xml" parent="/*">
@@ -32,7 +27,7 @@
             </feature>
         </config-file>
 
-        <framework src="com.google.android.gms:play-services-ads:$PLAY_SERVICES_VERSION" />
+        <framework src="com.google.android.libraries.ads.mobile.sdk:ads-mobile-sdk:$GMA_NEXT_GEN_VERSION" />
 
         <source-file src="src/android/core/util.kt" target-dir="app/src/main/kotlin/admob/plus/core" />
         <source-file src="src/android/cordova/AdMob.kt" target-dir="app/src/main/kotlin/admob/plus/cordova" />
