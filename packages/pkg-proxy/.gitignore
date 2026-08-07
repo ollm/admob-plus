@@ -1,6 +1,4 @@
 *-debug.log
 *-error.log
-/dist
-/lib
 /package-lock.json
 node_modules
