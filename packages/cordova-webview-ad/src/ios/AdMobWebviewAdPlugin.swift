@@ -16,35 +16,41 @@ class AdMobWebviewAdPlugin: CDVPlugin, CDVPluginNavigationHandler {
            x == "true" {
             let webView = self.webViewEngine.engineWebView as! WKWebView
             MobileAds.shared.register(webView)
+            NSLog("[AdMobWebViewAd] Registered WebView API for Ads")
             // webView.reload()
+        } else {
+            NSLog("[AdMobWebViewAd] WebView API for Ads is disabled or not configured")
         }
 
         if let x = self.commandDelegate.settings["AdMobPlusOverrideUrlLoading".lowercased()] as? String {
             overrideUrlLoading = x == "true"
         }
+        NSLog("%@", "[AdMobWebViewAd] Override URL loading: \(overrideUrlLoading)")
     }
 
     @objc func shouldOverrideLoad(with request: URLRequest, navigationType: CDVWebViewNavigationType, info: [AnyHashable: Any]) -> Bool {
         var allowNavigationsPass = true
 
+        guard let url = request.url else {
+            return allowNavigationsPass
+        }
+
+        let webView = self.webViewEngine.engineWebView as? WKWebView
+        let currentURL = webView?.url
+        let isCurrentURL = currentURL == nil || currentURL == url
+        let sourceFrame = info["sourceFrame"] as? WKFrameInfo
+        let targetFrame = info["targetFrame"] as? WKFrameInfo
+        let isNewWindowNavigation = targetFrame == nil
+        let isMainFrameNavigation = targetFrame?.isMainFrame ?? (sourceFrame?.isMainFrame ?? true)
+
         if overrideUrlLoading {
-            if let url = request.url, url.scheme == "http" || url.scheme == "https" {
-                let webView = self.webViewEngine.engineWebView as? WKWebView
-                let isInitialOrCurrentPage = webView?.url == nil || webView?.url == url
+            if url.scheme == "http" || url.scheme == "https" {
+                // Ad clicks can arrive as WKNavigationType.other from an iframe.
+                // Any HTTP(S) navigation to a different URL should leave the app.
+                allowNavigationsPass = isCurrentURL || (!isMainFrameNavigation && !isNewWindowNavigation)
 
-                if info["sourceFrame"] == nil && !isInitialOrCurrentPage {
+                if navigationType == CDVWebViewNavigationType(WKNavigationType.linkActivated.rawValue) {
                     allowNavigationsPass = false
-                }
-
-                switch navigationType {
-                case CDVWebViewNavigationType(WKNavigationType.linkActivated.rawValue):
-                    allowNavigationsPass = false
-                case CDVWebViewNavigationType(WKNavigationType.other.rawValue):
-                    if url.absoluteString.range(of: "utm_content") != nil {
-                        allowNavigationsPass = false
-                    }
-                default:
-                    break
                 }
 
                 // Allow webviewGoto urls to pass
@@ -53,7 +59,17 @@ class AdMobWebviewAdPlugin: CDVPlugin, CDVPluginNavigationHandler {
                 }
 
                 if !allowNavigationsPass {
-                    UIApplication.shared.open(url)
+                    NSLog("%@", "[AdMobWebViewAd] Opening URL in external browser: \(url.absoluteString)")
+                    DispatchQueue.main.async {
+                        guard UIApplication.shared.canOpenURL(url) else {
+                            NSLog("%@", "[AdMobWebViewAd] Cannot open URL: \(url.absoluteString)")
+                            return
+                        }
+
+                        UIApplication.shared.open(url, options: [:]) { success in
+                            NSLog("%@", "[AdMobWebViewAd] External URL open result: \(success), url=\(url.absoluteString)")
+                        }
+                    }
                 }
             }
         }
