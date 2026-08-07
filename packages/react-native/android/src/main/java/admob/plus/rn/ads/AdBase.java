@@ -5,8 +5,8 @@ import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
-import com.google.android.gms.ads.AdError;
-import com.google.android.gms.ads.rewarded.RewardItem;
+import com.google.android.libraries.ads.mobile.sdk.common.AdError;
+import com.google.android.libraries.ads.mobile.sdk.rewarded.RewardItem;
 
 import java.util.Map;
 

@@ -3,8 +3,8 @@ package admob.plus.core
 import android.R
 import android.app.Activity
 import android.view.ViewGroup
-import com.google.android.gms.ads.AdError
-import com.google.android.gms.ads.rewarded.RewardItem
+import com.google.android.libraries.ads.mobile.sdk.common.AdError
+import com.google.android.libraries.ads.mobile.sdk.rewarded.RewardItem
 import java.util.Objects
 
 abstract class Ad(val id: Int, val adUnitId: String) {

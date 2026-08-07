@@ -14,7 +14,8 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
-import com.google.android.gms.ads.MobileAds;
+import com.google.android.libraries.ads.mobile.sdk.MobileAds;
+import com.google.android.libraries.ads.mobile.sdk.initialization.InitializationConfig;
 
 import java.util.Map;
 
@@ -44,10 +45,14 @@ public class AdMobPlusRNModule extends ReactContextBaseJavaModule implements Hel
 
     @ReactMethod
     public void start(Promise promise) {
-        MobileAds.initialize(reactContext, status -> {
+        String appId = reactContext.getApplicationInfo().metaData != null
+            ? reactContext.getApplicationInfo().metaData.getString("com.google.android.gms.ads.APPLICATION_ID")
+            : null;
+        if (appId == null) appId = "ca-app-pub-xxx~yyy";
+        MobileAds.initialize(reactContext, InitializationConfig.Builder(appId).build(), status -> {
             helper.configForTestLab();
             WritableMap result = Arguments.createMap();
-            result.putString("version", MobileAds.getVersionString());
+            result.putString("version", MobileAds.getVersion().toString());
             promise.resolve(result);
         });
     }

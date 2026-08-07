@@ -12,8 +12,8 @@ import com.getcapacitor.Plugin
 import com.getcapacitor.PluginCall
 import com.getcapacitor.PluginMethod
 import com.getcapacitor.annotation.CapacitorPlugin
-import com.google.android.gms.ads.MobileAds
-import com.google.android.gms.ads.initialization.InitializationStatus
+import com.google.android.libraries.ads.mobile.sdk.MobileAds
+import com.google.android.libraries.ads.mobile.sdk.initialization.InitializationConfig
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -46,7 +46,9 @@ class AdMobPlusPlugin : Plugin(), Helper.Adapter {
 
     @PluginMethod
     fun start(call: PluginCall) {
-        MobileAds.initialize(context) { status: InitializationStatus? ->
+        val appId = context.applicationInfo.metaData?.getString("com.google.android.gms.ads.APPLICATION_ID")
+            ?: "ca-app-pub-xxx~yyy"
+        MobileAds.initialize(context, InitializationConfig.Builder(appId).build()) {
             helper!!.configForTestLab()
             call.resolve()
         }

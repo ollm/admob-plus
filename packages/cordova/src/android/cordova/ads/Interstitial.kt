@@ -2,11 +2,11 @@ package admob.plus.cordova.ads
 
 import admob.plus.cordova.Events
 import admob.plus.cordova.ExecuteContext
-import com.google.android.gms.ads.AdError
-import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.interstitial.InterstitialAd
-import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
-import com.google.android.gms.ads.FullScreenContentCallback
+import com.google.android.libraries.ads.mobile.sdk.common.AdLoadCallback
+import com.google.android.libraries.ads.mobile.sdk.common.FullScreenContentError
+import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
+import com.google.android.libraries.ads.mobile.sdk.interstitial.InterstitialAd
+import com.google.android.libraries.ads.mobile.sdk.interstitial.InterstitialAdEventCallback
 
 class Interstitial(ctx: ExecuteContext) : AdBase(ctx) {
     private var mAd: InterstitialAd? = null
@@ -20,16 +20,16 @@ class Interstitial(ctx: ExecuteContext) : AdBase(ctx) {
 
     override fun load(ctx: ExecuteContext) {
         clear()
-        InterstitialAd.load(ctx.activity, adUnitId, adRequest, object : InterstitialAdLoadCallback() {
-            override fun onAdLoaded(interstitialAd: InterstitialAd) {
-                mAd = interstitialAd
-                mAd!!.fullScreenContentCallback = object : FullScreenContentCallback() {
+        InterstitialAd.load(adRequest, object : AdLoadCallback<InterstitialAd> {
+            override fun onAdLoaded(ad: InterstitialAd) {
+                mAd = ad
+                mAd!!.adEventCallback = object : InterstitialAdEventCallback {
                     override fun onAdDismissedFullScreenContent() {
                         emit(Events.AD_DISMISS)
                     }
 
-                    override fun onAdFailedToShowFullScreenContent(adError: AdError) {
-                        emit(Events.AD_SHOW_FAIL, adError)
+                    override fun onAdFailedToShowFullScreenContent(fullScreenContentError: FullScreenContentError) {
+                        emit(Events.AD_SHOW_FAIL, fullScreenContentError)
                     }
 
                     override fun onAdShowedFullScreenContent() {
@@ -45,10 +45,10 @@ class Interstitial(ctx: ExecuteContext) : AdBase(ctx) {
                 ctx.resolve()
             }
 
-            override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+            override fun onAdFailedToLoad(adError: LoadAdError) {
                 mAd = null
-                emit(Events.AD_LOAD_FAIL, loadAdError)
-                ctx.reject(loadAdError.toString())
+                emit(Events.AD_LOAD_FAIL, adError)
+                ctx.reject(adError.toString())
             }
         })
     }
@@ -64,7 +64,7 @@ class Interstitial(ctx: ExecuteContext) : AdBase(ctx) {
 
     private fun clear() {
         mAd?.let {
-            it.fullScreenContentCallback = null
+            it.adEventCallback = null
             mAd = null
         }
     }

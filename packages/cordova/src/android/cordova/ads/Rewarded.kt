@@ -2,26 +2,23 @@ package admob.plus.cordova.ads
 
 import admob.plus.cordova.Events
 import admob.plus.cordova.ExecuteContext
-import com.google.android.gms.ads.AdError
-import com.google.android.gms.ads.FullScreenContentCallback
-import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.rewarded.RewardItem
-import com.google.android.gms.ads.rewarded.RewardedAd
-import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
-import com.google.android.gms.ads.rewarded.ServerSideVerificationOptions
+import com.google.android.libraries.ads.mobile.sdk.common.AdLoadCallback
+import com.google.android.libraries.ads.mobile.sdk.common.FullScreenContentError
+import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
+import com.google.android.libraries.ads.mobile.sdk.rewarded.OnUserEarnedRewardListener
+import com.google.android.libraries.ads.mobile.sdk.rewarded.RewardItem
+import com.google.android.libraries.ads.mobile.sdk.rewarded.RewardedAd
+import com.google.android.libraries.ads.mobile.sdk.rewarded.RewardedAdEventCallback
+import com.google.android.libraries.ads.mobile.sdk.rewarded.ServerSideVerificationOptions
 import org.json.JSONObject
 
 fun buildServerSideVerificationOptions(opts: JSONObject): ServerSideVerificationOptions? {
     val param = "serverSideVerification"
     val serverSideVerification = opts.optJSONObject(param) ?: return null
-    val builder = ServerSideVerificationOptions.Builder()
-    if (serverSideVerification.has("customData")) {
-        builder.setCustomData(serverSideVerification.optString("customData"))
-    }
-    if (serverSideVerification.has("userId")) {
-        builder.setUserId(serverSideVerification.optString("userId"))
-    }
-    return builder.build()
+    return ServerSideVerificationOptions(
+        serverSideVerification.optString("userId"),
+        serverSideVerification.optString("customData")
+    )
 }
 
 class Rewarded(ctx: ExecuteContext) : AdBase(ctx) {
@@ -33,26 +30,26 @@ class Rewarded(ctx: ExecuteContext) : AdBase(ctx) {
 
     override fun load(ctx: ExecuteContext) {
         clear()
-        RewardedAd.load(plugin.activity, adUnitId, adRequest, object : RewardedAdLoadCallback() {
-            override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+        RewardedAd.load(adRequest, object : AdLoadCallback<RewardedAd> {
+            override fun onAdFailedToLoad(adError: LoadAdError) {
                 mAd = null
-                emit(Events.AD_LOAD_FAIL, loadAdError)
-                ctx.reject(loadAdError.toString())
+                emit(Events.AD_LOAD_FAIL, adError)
+                ctx.reject(adError.toString())
             }
 
-            override fun onAdLoaded(rewardedAd: RewardedAd) {
-                mAd = rewardedAd
+            override fun onAdLoaded(ad: RewardedAd) {
+                mAd = ad
                 val ssv = buildServerSideVerificationOptions(initOpts)
                 if (ssv != null) {
                     mAd!!.setServerSideVerificationOptions(ssv)
                 }
-                mAd!!.fullScreenContentCallback = object : FullScreenContentCallback() {
+                mAd!!.adEventCallback = object : RewardedAdEventCallback {
                     override fun onAdDismissedFullScreenContent() {
                         emit(Events.AD_DISMISS)
                     }
 
-                    override fun onAdFailedToShowFullScreenContent(adError: AdError) {
-                        emit(Events.AD_SHOW_FAIL, adError)
+                    override fun onAdFailedToShowFullScreenContent(fullScreenContentError: FullScreenContentError) {
+                        emit(Events.AD_SHOW_FAIL, fullScreenContentError)
                     }
 
                     override fun onAdShowedFullScreenContent() {
@@ -74,9 +71,9 @@ class Rewarded(ctx: ExecuteContext) : AdBase(ctx) {
 
     override fun show(ctx: ExecuteContext) {
         if (this.isLoaded) {
-            mAd!!.show(plugin.activity) { rewardItem: RewardItem? ->
-                emit(Events.AD_REWARD, rewardItem!!)
-            }
+            mAd!!.show(plugin.activity, OnUserEarnedRewardListener { rewardItem ->
+                emit(Events.AD_REWARD, rewardItem)
+            })
             ctx.resolve()
         } else {
             ctx.reject("Ad is not loaded")

@@ -1,18 +1,14 @@
-import {ListrBaseClassOptions} from 'listr2';
-import {Pkg} from 'pkg-proxy';
+import type { ListrBaseClassOptions } from "listr2";
+import type { Pkg } from "pkg-proxy";
 
 export interface Ctx {
   pkg?: Pkg;
   swiftVersion: string;
-  playServicesVersion: string;
+  gmaNextGenVersion: string;
   iosSDKVersion: string;
 }
 
-export const options: ListrBaseClassOptions<any, any, 'simple'> = {
+export const options: ListrBaseClassOptions<Ctx, "default", "simple"> = {
   concurrent: true,
   exitOnError: false,
-  rendererOptions: {
-    collapse: false,
-    persistentOutput: true,
-  },
 };

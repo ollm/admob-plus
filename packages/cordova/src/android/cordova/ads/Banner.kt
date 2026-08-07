@@ -13,10 +13,14 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
-import com.google.android.gms.ads.AdListener
-import com.google.android.gms.ads.AdSize
-import com.google.android.gms.ads.AdView
-import com.google.android.gms.ads.LoadAdError
+import com.google.android.libraries.ads.mobile.sdk.banner.AdSize
+import com.google.android.libraries.ads.mobile.sdk.banner.AdView
+import com.google.android.libraries.ads.mobile.sdk.banner.BannerAd
+import com.google.android.libraries.ads.mobile.sdk.banner.BannerAdEventCallback
+import com.google.android.libraries.ads.mobile.sdk.banner.BannerAdRequest
+import com.google.android.libraries.ads.mobile.sdk.common.AdLoadCallback
+import com.google.android.libraries.ads.mobile.sdk.common.FullScreenContentError
+import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
 import org.json.JSONObject
 
 enum class AdSizeType {
@@ -31,7 +35,6 @@ enum class AdSizeType {
                 FULL_BANNER -> AdSize.FULL_BANNER
                 LEADERBOARD -> AdSize.LEADERBOARD
                 SMART_BANNER -> AdSize.BANNER
-                else -> null
             }
         }
     }
@@ -68,46 +71,27 @@ class Banner(ctx: ExecuteContext) : AdBase(ctx) {
         if (mAdView == null) {
             mAdView = createBannerView()
         }
-        mAdView!!.loadAd(adRequest)
+        mAdView!!.loadAd(
+            BannerAdRequest.Builder(adUnitId, adSize).build(),
+            object : AdLoadCallback<BannerAd> {
+                override fun onAdLoaded(ad: BannerAd) {
+                    ad.adEventCallback = object : BannerAdEventCallback {
+                        override fun onAdClicked() = emit(Events.AD_CLICK)
+                        override fun onAdImpression() = emit(Events.AD_IMPRESSION)
+                    }
+                    emit(Events.AD_LOAD, computeAdSize())
+                }
+
+                override fun onAdFailedToLoad(adError: LoadAdError) {
+                    emit(Events.AD_LOAD_FAIL, adError)
+                }
+            },
+        )
         ctx.resolve()
     }
 
     private fun createBannerView(): AdView {
         val adView = AdView(plugin.activity)
-        adView.adUnitId = adUnitId
-        adView.setAdSize(adSize)
-        adView.adListener = object : AdListener() {
-            override fun onAdClicked() {
-                emit(Events.AD_CLICK)
-            }
-
-            override fun onAdClosed() {
-                emit(Events.AD_DISMISS)
-            }
-
-            override fun onAdFailedToLoad(error: LoadAdError) {
-                emit(Events.AD_LOAD_FAIL, error)
-            }
-
-            override fun onAdImpression() {
-                emit(Events.AD_IMPRESSION)
-            }
-
-            override fun onAdLoaded() {
-                if (mAdViewOld != null) {
-                    removeBannerView(mAdViewOld!!)
-                    mAdViewOld = null
-                }
-                runJustBeforeBeingDrawn(adView) {
-                    emit(Events.BANNER_SIZE, computeAdSize())
-                }
-                emit(Events.AD_LOAD, computeAdSize())
-            }
-
-            override fun onAdOpened() {
-                emit(Events.AD_SHOW)
-            }
-        }
         return adView
     }
 
@@ -128,7 +112,6 @@ class Banner(ctx: ExecuteContext) : AdBase(ctx) {
         if (mAdView!!.parent == null) {
             addBannerView()
         } else if (mAdView!!.visibility == View.GONE) {
-            mAdView!!.resume()
             mAdView!!.visibility = View.VISIBLE
         } else {
             val wvParentView = getParentView(webView)
@@ -142,7 +125,6 @@ class Banner(ctx: ExecuteContext) : AdBase(ctx) {
 
     override fun hide(ctx: ExecuteContext) {
         if (mAdView != null) {
-            mAdView!!.pause()
             mAdView!!.visibility = View.GONE
         }
         ctx.resolve()
@@ -163,7 +145,15 @@ class Banner(ctx: ExecuteContext) : AdBase(ctx) {
         if (mAdViewOld != null) removeBannerView(mAdViewOld!!)
         mAdViewOld = mAdView
         mAdView = createBannerView()
-        mAdView!!.loadAd(adRequest)
+        mAdView!!.loadAd(BannerAdRequest.Builder(adUnitId, adSize).build(), object : AdLoadCallback<BannerAd> {
+            override fun onAdLoaded(ad: BannerAd) {
+                emit(Events.AD_LOAD, computeAdSize())
+            }
+
+            override fun onAdFailedToLoad(adError: LoadAdError) {
+                emit(Events.AD_LOAD_FAIL, adError)
+            }
+        })
         addBannerView()
     }
 
@@ -173,10 +163,8 @@ class Banner(ctx: ExecuteContext) : AdBase(ctx) {
     }
 
     private fun pauseBannerViews() {
-        if (mAdView != null) mAdView!!.pause()
-        if (mAdViewOld != null && mAdViewOld != mAdView) {
-            mAdViewOld!!.pause()
-        }
+        mAdView?.visibility = View.GONE
+        if (mAdViewOld != null && mAdViewOld != mAdView) mAdViewOld!!.visibility = View.GONE
     }
 
     override fun onResume(multitasking: Boolean) {
@@ -185,8 +173,8 @@ class Banner(ctx: ExecuteContext) : AdBase(ctx) {
     }
 
     private fun resumeBannerViews() {
-        if (mAdView != null) mAdView!!.resume()
-        if (mAdViewOld != null) mAdViewOld!!.resume()
+        mAdView?.visibility = View.VISIBLE
+        if (mAdViewOld != null && mAdViewOld != mAdView) mAdViewOld!!.visibility = View.VISIBLE
     }
 
     override fun onDestroy() {
@@ -307,7 +295,6 @@ class Banner(ctx: ExecuteContext) : AdBase(ctx) {
                     FULL_BANNER -> AdSize.FULL_BANNER
                     LEADERBOARD -> AdSize.LEADERBOARD
                     SMART_BANNER -> AdSize.BANNER
-                    else -> null
                 }
             }
         }

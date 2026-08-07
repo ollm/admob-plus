@@ -4,12 +4,13 @@ import admob.plus.capacitor.ExecuteContext
 import admob.plus.capacitor.Generated
 import admob.plus.core.Context
 import admob.plus.core.GenericAd
-import com.google.android.gms.ads.AdError
-import com.google.android.gms.ads.FullScreenContentCallback
-import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.rewarded.RewardItem
-import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd
-import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAdLoadCallback
+import com.google.android.libraries.ads.mobile.sdk.common.AdLoadCallback
+import com.google.android.libraries.ads.mobile.sdk.common.FullScreenContentError
+import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
+import com.google.android.libraries.ads.mobile.sdk.rewarded.OnUserEarnedRewardListener
+import com.google.android.libraries.ads.mobile.sdk.rewarded.RewardItem
+import com.google.android.libraries.ads.mobile.sdk.rewardedinterstitial.RewardedInterstitialAd
+import com.google.android.libraries.ads.mobile.sdk.rewardedinterstitial.RewardedInterstitialAdEventCallback
 
 class RewardedInterstitial(ctx: ExecuteContext?) : AdBase(ctx), GenericAd {
     private var mAd: RewardedInterstitialAd? = null
@@ -21,10 +22,8 @@ class RewardedInterstitial(ctx: ExecuteContext?) : AdBase(ctx), GenericAd {
     override fun load(ctx: Context?) {
         clear()
         RewardedInterstitialAd.load(
-            activity,
-            adUnitId,
             ctx!!.optAdRequest(),
-            object : RewardedInterstitialAdLoadCallback() {
+            object : AdLoadCallback<RewardedInterstitialAd> {
                 override fun onAdFailedToLoad(loadAdError: LoadAdError) {
                     clear()
                     emit(Generated.Events.REWARDED_INTERSTITIAL_LOAD_FAIL, loadAdError)
@@ -37,13 +36,13 @@ class RewardedInterstitial(ctx: ExecuteContext?) : AdBase(ctx), GenericAd {
                     if (ssv != null) {
                         mAd!!.setServerSideVerificationOptions(ssv)
                     }
-                    mAd!!.fullScreenContentCallback = object : FullScreenContentCallback() {
+                    mAd!!.adEventCallback = object : RewardedInterstitialAdEventCallback {
                         override fun onAdDismissedFullScreenContent() {
                             clear()
                             emit(Generated.Events.REWARDED_INTERSTITIAL_DISMISS)
                         }
 
-                        override fun onAdFailedToShowFullScreenContent(adError: AdError) {
+                        override fun onAdFailedToShowFullScreenContent(adError: FullScreenContentError) {
                             emit(Generated.Events.REWARDED_INTERSTITIAL_SHOW_FAIL, adError)
                         }
 
@@ -65,18 +64,17 @@ class RewardedInterstitial(ctx: ExecuteContext?) : AdBase(ctx), GenericAd {
         get() = mAd != null
 
     override fun show(ctx: Context?) {
-        mAd!!.show(activity) { rewardItem: RewardItem? ->
+        mAd!!.show(activity, OnUserEarnedRewardListener { rewardItem ->
             emit(
                 Generated.Events.REWARDED_INTERSTITIAL_REWARD,
                 rewardItem!!
             )
-        }
+        })
         ctx!!.resolve()
     }
 
     private fun clear() {
         if (mAd != null) {
-            mAd!!.fullScreenContentCallback = null
             mAd = null
         }
     }

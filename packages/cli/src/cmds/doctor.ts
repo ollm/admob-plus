@@ -18,7 +18,7 @@ export async function handler() {
   const ctx: Ctx = {
     pkg,
     swiftVersion: "5.3",
-    playServicesVersion: pluginInfo.playServicesVersion,
+    gmaNextGenVersion: pluginInfo.gmaNextGenVersion,
     iosSDKVersion: pluginInfo.iosSDKVersion,
   };
 

@@ -1,16 +1,14 @@
 package admob.plus.core;
 
-import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.google.ads.mediation.admob.AdMobAdapter;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.RequestConfiguration;
-import com.google.android.gms.ads.rewarded.ServerSideVerificationOptions;
+import com.google.android.libraries.ads.mobile.sdk.MobileAds;
+import com.google.android.libraries.ads.mobile.sdk.common.AdRequest;
+import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError;
+import com.google.android.libraries.ads.mobile.sdk.common.RequestConfiguration;
+import com.google.android.libraries.ads.mobile.sdk.rewarded.ServerSideVerificationOptions;
 
 import org.json.JSONObject;
 
@@ -19,7 +17,7 @@ import java.util.Objects;
 
 public interface Context {
     @Nullable
-    static Integer intFromBool(Context ctx, String name, int vNull, int vTrue, int vFalse) {
+    static <T> T valueFromBool(Context ctx, String name, T vNull, T vTrue, T vFalse) {
         if (!ctx.has(name)) return null;
         final Boolean v = ctx.optBoolean(name);
         if (v == null) return vNull;
@@ -117,34 +115,35 @@ public interface Context {
 
     @NonNull
     default AdRequest optAdRequest() {
-        AdRequest.Builder builder = new AdRequest.Builder();
+        AdRequest.Builder builder = new AdRequest.Builder(Objects.requireNonNull(optAdUnitID()));
         if (this.has("contentUrl")) {
             builder.setContentUrl(Objects.requireNonNull(this.optString("contentUrl")));
         }
-        Bundle extras = new Bundle();
-        if (this.has("npa")) {
-            extras.putString("npa", this.optString("npa"));
-        }
-        return builder.addNetworkExtrasBundle(AdMobAdapter.class, extras).build();
+        return builder.build();
     }
 
     @NonNull
     default RequestConfiguration optRequestConfiguration() {
         final RequestConfiguration.Builder builder = new RequestConfiguration.Builder();
         if (this.has("maxAdContentRating")) {
-            builder.setMaxAdContentRating(this.optString("maxAdContentRating"));
+            switch (this.optString("maxAdContentRating")) {
+                case "G": builder.setMaxAdContentRating(RequestConfiguration.MaxAdContentRating.MAX_AD_CONTENT_RATING_G); break;
+                case "PG": builder.setMaxAdContentRating(RequestConfiguration.MaxAdContentRating.MAX_AD_CONTENT_RATING_PG); break;
+                case "T": builder.setMaxAdContentRating(RequestConfiguration.MaxAdContentRating.MAX_AD_CONTENT_RATING_T); break;
+                case "MA": builder.setMaxAdContentRating(RequestConfiguration.MaxAdContentRating.MAX_AD_CONTENT_RATING_MA); break;
+            }
         }
-        final Integer tagForChildDirectedTreatment = intFromBool(this, "tagForChildDirectedTreatment",
-                RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_UNSPECIFIED,
-                RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE,
-                RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_FALSE);
+        final RequestConfiguration.TagForChildDirectedTreatment tagForChildDirectedTreatment = valueFromBool(this, "tagForChildDirectedTreatment",
+                RequestConfiguration.TagForChildDirectedTreatment.TAG_FOR_CHILD_DIRECTED_TREATMENT_UNSPECIFIED,
+                RequestConfiguration.TagForChildDirectedTreatment.TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE,
+                RequestConfiguration.TagForChildDirectedTreatment.TAG_FOR_CHILD_DIRECTED_TREATMENT_FALSE);
         if (tagForChildDirectedTreatment != null) {
             builder.setTagForChildDirectedTreatment(tagForChildDirectedTreatment);
         }
-        final Integer tagForUnderAgeOfConsent = intFromBool(this, "tagForUnderAgeOfConsent",
-                RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_UNSPECIFIED,
-                RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_TRUE,
-                RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_FALSE);
+        final RequestConfiguration.TagForUnderAgeOfConsent tagForUnderAgeOfConsent = valueFromBool(this, "tagForUnderAgeOfConsent",
+                RequestConfiguration.TagForUnderAgeOfConsent.TAG_FOR_UNDER_AGE_OF_CONSENT_UNSPECIFIED,
+                RequestConfiguration.TagForUnderAgeOfConsent.TAG_FOR_UNDER_AGE_OF_CONSENT_TRUE,
+                RequestConfiguration.TagForUnderAgeOfConsent.TAG_FOR_UNDER_AGE_OF_CONSENT_FALSE);
         if (tagForUnderAgeOfConsent != null) {
             builder.setTagForUnderAgeOfConsent(tagForUnderAgeOfConsent);
         }
@@ -160,25 +159,12 @@ public interface Context {
         JSONObject serverSideVerification = this.optObject(param);
         if (serverSideVerification == null) return null;
 
-        ServerSideVerificationOptions.Builder builder = new ServerSideVerificationOptions.Builder();
-        if (serverSideVerification.has("customData")) {
-            builder.setCustomData(serverSideVerification.optString("customData"));
-        }
-        if (serverSideVerification.has("userId")) {
-            builder.setUserId(serverSideVerification.optString("userId"));
-        }
-        return builder.build();
+        return new ServerSideVerificationOptions(
+                serverSideVerification.optString("userId"),
+                serverSideVerification.optString("customData"));
     }
 
     default void configure(Helper helper) {
-        Boolean appMuted = optAppMuted();
-        if (appMuted != null) {
-            MobileAds.setAppMuted(appMuted);
-        }
-        Float appVolume = optAppVolume();
-        if (appVolume != null) {
-            MobileAds.setAppVolume(appVolume);
-        }
         MobileAds.setRequestConfiguration(optRequestConfiguration());
         helper.configForTestLab();
         resolve();

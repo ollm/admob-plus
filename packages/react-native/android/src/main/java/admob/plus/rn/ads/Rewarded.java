@@ -2,12 +2,13 @@ package admob.plus.rn.ads;
 
 import androidx.annotation.NonNull;
 
-import com.google.android.gms.ads.AdError;
-import com.google.android.gms.ads.FullScreenContentCallback;
-import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.rewarded.RewardedAd;
-import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
-import com.google.android.gms.ads.rewarded.ServerSideVerificationOptions;
+import com.google.android.libraries.ads.mobile.sdk.common.AdLoadCallback;
+import com.google.android.libraries.ads.mobile.sdk.common.FullScreenContentError;
+import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError;
+import com.google.android.libraries.ads.mobile.sdk.rewarded.OnUserEarnedRewardListener;
+import com.google.android.libraries.ads.mobile.sdk.rewarded.RewardedAd;
+import com.google.android.libraries.ads.mobile.sdk.rewarded.RewardedAdEventCallback;
+import com.google.android.libraries.ads.mobile.sdk.rewarded.ServerSideVerificationOptions;
 
 import admob.plus.core.Context;
 import admob.plus.core.GenericAd;
@@ -32,7 +33,7 @@ public class Rewarded extends AdBase implements GenericAd {
     public void load(Context ctx) {
         clear();
 
-        RewardedAd.load(getAdapter().getActivity(), adUnitId, ctx.optAdRequest(), new RewardedAdLoadCallback() {
+        RewardedAd.load(ctx.optAdRequest(), new AdLoadCallback<RewardedAd>() {
             @Override
             public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                 emit(Events.AD_LOAD_FAIL, loadAdError);
@@ -46,7 +47,7 @@ public class Rewarded extends AdBase implements GenericAd {
                 if (ssv != null) {
                     mAd.setServerSideVerificationOptions(ssv);
                 }
-                mAd.setFullScreenContentCallback(new FullScreenContentCallback() {
+                mAd.adEventCallback = new RewardedAdEventCallback() {
                     @Override
                     public void onAdDismissedFullScreenContent() {
                         clear();
@@ -54,7 +55,7 @@ public class Rewarded extends AdBase implements GenericAd {
                     }
 
                     @Override
-                    public void onAdFailedToShowFullScreenContent(AdError adError) {
+                    public void onAdFailedToShowFullScreenContent(FullScreenContentError adError) {
                         clear();
                         emit(Events.AD_SHOW_FAIL, adError);
                     }
@@ -83,7 +84,7 @@ public class Rewarded extends AdBase implements GenericAd {
 
     @Override
     public void show(Context ctx) {
-        mAd.show(getAdapter().getActivity(), rewardItem -> {
+        mAd.show(getAdapter().getActivity(), (OnUserEarnedRewardListener) rewardItem -> {
             emit(Events.AD_REWARD, rewardItem);
         });
         ctx.resolve();

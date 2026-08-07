@@ -11,13 +11,14 @@ import admob.plus.cordova.ads.getParentView
 import admob.plus.core.buildRequestConfiguration
 import admob.plus.core.configForTestLabIfNeeded
 import admob.plus.core.isRunningInTestLab
-import admob.plus.core.optFloat
 import android.app.Activity
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.util.Log
 import android.view.ViewGroup
 import android.webkit.WebView
-import com.google.android.gms.ads.MobileAds
+import com.google.android.libraries.ads.mobile.sdk.MobileAds
+import com.google.android.libraries.ads.mobile.sdk.initialization.InitializationConfig
 import org.apache.cordova.CallbackContext
 import org.apache.cordova.CordovaPlugin
 import org.apache.cordova.PluginResult
@@ -27,6 +28,7 @@ import org.json.JSONObject
 
 
 private const val TAG = "AdMobPlus"
+private const val APP_ID_METADATA_KEY = "com.google.android.gms.ads.APPLICATION_ID"
 
 class AdMob : CordovaPlugin() {
     lateinit var context: CallbackContext
@@ -85,7 +87,14 @@ class AdMob : CordovaPlugin() {
             ctx.resolve(mapOf("version" to version))
             return
         }
-        MobileAds.initialize(ctx.activity) {
+        val appId = ctx.activity.packageManager
+            .getApplicationInfo(ctx.activity.packageName, PackageManager.GET_META_DATA)
+            .metaData?.getString(APP_ID_METADATA_KEY)
+            ?: preferences.getString("APP_ID_ANDROID", "ca-app-pub-xxx~yyy")
+        MobileAds.initialize(
+            ctx.activity,
+            InitializationConfig.Builder(appId).build()
+        ) {
             configForTestLabIfNeeded(ctx.activity)
             ctx.resolve(mapOf("version" to version))
         }
@@ -93,12 +102,6 @@ class AdMob : CordovaPlugin() {
     }
 
     private fun executeConfigure(ctx: ExecuteContext) {
-        ctx.optBoolean("appMuted")?.let {
-            MobileAds.setAppMuted(it)
-        }
-        optFloat(ctx.opts, "appVolume")?.let {
-            MobileAds.setAppVolume(it)
-        }
         ctx.optBoolean("sameAppKey")?.let {
             MobileAds.putPublisherFirstPartyIdEnabled(it)
         }
