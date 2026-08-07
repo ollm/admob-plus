@@ -36,15 +36,14 @@ export async function readAdMobPlusPluginInfo() {
     require.resolve("admob-plus-cordova/plugin.xml"),
   );
   const plugin = new PluginInfo(pluginDir);
-  const playServicesPreference = plugin._et
+  const gmaNextGenPreference = plugin._et
     .find(
-      './platform/[@name="android"]/preference/[@name="PLAY_SERVICES_VERSION"]',
+      './platform/[@name="android"]/preference/[@name="GMA_NEXT_GEN_VERSION"]',
     )
     ?.get("default");
-  if (!playServicesPreference) {
+  if (!gmaNextGenPreference) {
     throw new Error("Invalid admob-plus-cordova plugin.xml");
   }
-  const playServicesVersion = playServicesPreference;
   const packageSwift = await readFile(
     path.join(pluginDir, "Package.swift"),
     "utf8",
@@ -57,7 +56,7 @@ export async function readAdMobPlusPluginInfo() {
   }
   return {
     ...plugin,
-    playServicesVersion,
+    gmaNextGenVersion: gmaNextGenPreference,
     iosSDKVersion,
   };
 }
@@ -75,11 +74,12 @@ export default [
       return task.newListr([
         {
           async task(_ctxAds, taskAds) {
-            const k = "com.google.android.gms:play-services-ads";
+            const k =
+              "com.google.android.libraries.ads.mobile.sdk:ads-mobile-sdk";
             taskAds.title = k;
             const versions = deps[k];
             const s = `${k}: ${[...versions].join(", ")}`;
-            if (versions.has(ctx.playServicesVersion)) {
+            if (versions.has(ctx.gmaNextGenVersion)) {
               taskAds.title = s;
             } else {
               throw new Error(s);

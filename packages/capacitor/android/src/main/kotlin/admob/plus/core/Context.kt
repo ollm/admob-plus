@@ -1,12 +1,10 @@
 package admob.plus.core
 
-import android.os.Bundle
-import com.google.ads.mediation.admob.AdMobAdapter
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.MobileAds
-import com.google.android.gms.ads.RequestConfiguration
-import com.google.android.gms.ads.rewarded.ServerSideVerificationOptions
+import com.google.android.libraries.ads.mobile.sdk.MobileAds
+import com.google.android.libraries.ads.mobile.sdk.common.AdRequest
+import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
+import com.google.android.libraries.ads.mobile.sdk.common.RequestConfiguration
+import com.google.android.libraries.ads.mobile.sdk.rewarded.ServerSideVerificationOptions
 import org.json.JSONObject
 import java.util.Objects
 
@@ -72,36 +70,37 @@ interface Context {
     }
 
     fun optAdRequest(): AdRequest {
-        val builder = AdRequest.Builder()
+        val builder = AdRequest.Builder(optAdUnitID() ?: "")
         if (has("contentUrl")) {
             Objects.requireNonNull(optString("contentUrl"))?.let { builder.setContentUrl(it) }
         }
-        val extras = Bundle()
-        if (has("npa")) {
-            extras.putString("npa", optString("npa"))
-        }
-        return builder.addNetworkExtrasBundle(AdMobAdapter::class.java, extras).build()
+        return builder.build()
     }
 
     fun optRequestConfiguration(): RequestConfiguration {
         val builder = RequestConfiguration.Builder()
         if (has("maxAdContentRating")) {
-            builder.setMaxAdContentRating(optString("maxAdContentRating"))
+            when (optString("maxAdContentRating")) {
+                "G" -> builder.setMaxAdContentRating(RequestConfiguration.MaxAdContentRating.MAX_AD_CONTENT_RATING_G)
+                "PG" -> builder.setMaxAdContentRating(RequestConfiguration.MaxAdContentRating.MAX_AD_CONTENT_RATING_PG)
+                "T" -> builder.setMaxAdContentRating(RequestConfiguration.MaxAdContentRating.MAX_AD_CONTENT_RATING_T)
+                "MA" -> builder.setMaxAdContentRating(RequestConfiguration.MaxAdContentRating.MAX_AD_CONTENT_RATING_MA)
+            }
         }
-        val tagForChildDirectedTreatment = intFromBool(
+        val tagForChildDirectedTreatment = valueFromBool(
             this, "tagForChildDirectedTreatment",
-            RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_UNSPECIFIED,
-            RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE,
-            RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_FALSE
+            RequestConfiguration.TagForChildDirectedTreatment.TAG_FOR_CHILD_DIRECTED_TREATMENT_UNSPECIFIED,
+            RequestConfiguration.TagForChildDirectedTreatment.TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE,
+            RequestConfiguration.TagForChildDirectedTreatment.TAG_FOR_CHILD_DIRECTED_TREATMENT_FALSE
         )
         if (tagForChildDirectedTreatment != null) {
             builder.setTagForChildDirectedTreatment(tagForChildDirectedTreatment)
         }
-        val tagForUnderAgeOfConsent = intFromBool(
+        val tagForUnderAgeOfConsent = valueFromBool(
             this, "tagForUnderAgeOfConsent",
-            RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_UNSPECIFIED,
-            RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_TRUE,
-            RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_FALSE
+            RequestConfiguration.TagForUnderAgeOfConsent.TAG_FOR_UNDER_AGE_OF_CONSENT_UNSPECIFIED,
+            RequestConfiguration.TagForUnderAgeOfConsent.TAG_FOR_UNDER_AGE_OF_CONSENT_TRUE,
+            RequestConfiguration.TagForUnderAgeOfConsent.TAG_FOR_UNDER_AGE_OF_CONSENT_FALSE
         )
         if (tagForUnderAgeOfConsent != null) {
             builder.setTagForUnderAgeOfConsent(tagForUnderAgeOfConsent)
@@ -115,32 +114,20 @@ interface Context {
     fun optServerSideVerificationOptions(): ServerSideVerificationOptions? {
         val param = "serverSideVerification"
         val serverSideVerification = optObject(param) ?: return null
-        val builder = ServerSideVerificationOptions.Builder()
-        if (serverSideVerification.has("customData")) {
-            builder.setCustomData(serverSideVerification.optString("customData"))
-        }
-        if (serverSideVerification.has("userId")) {
-            builder.setUserId(serverSideVerification.optString("userId"))
-        }
-        return builder.build()
+        return ServerSideVerificationOptions(
+            serverSideVerification.optString("userId"),
+            serverSideVerification.optString("customData")
+        )
     }
 
     fun configure(helper: Helper) {
-        val appMuted = optAppMuted()
-        if (appMuted != null) {
-            MobileAds.setAppMuted(appMuted)
-        }
-        val appVolume = optAppVolume()
-        if (appVolume != null) {
-            MobileAds.setAppVolume(appVolume)
-        }
         MobileAds.setRequestConfiguration(optRequestConfiguration())
         helper.configForTestLab()
         resolve()
     }
 
     companion object {
-        fun intFromBool(ctx: Context, name: String, vNull: Int, vTrue: Int, vFalse: Int): Int? {
+        fun <T> valueFromBool(ctx: Context, name: String, vNull: T, vTrue: T, vFalse: T): T? {
             if (!ctx.has(name)) return null
             val v = ctx.optBoolean(name) ?: return vNull
             return if (v) vTrue else vFalse

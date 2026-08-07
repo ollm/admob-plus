@@ -14,20 +14,20 @@ export default class Generator {
 
   async files() {
     const cordovaPlugin = new PluginInfo(this.cordovaGen.pkgDir());
-    const PLAY_SERVICES_VERSION = cordovaPlugin._et
+    const GMA_NEXT_GEN_VERSION = cordovaPlugin._et
       .find(
-        './platform/[@name="android"]/preference/[@name="PLAY_SERVICES_VERSION"]',
+        './platform/[@name="android"]/preference/[@name="GMA_NEXT_GEN_VERSION"]',
       )
       ?.get("default");
-    assert(PLAY_SERVICES_VERSION);
+    assert(GMA_NEXT_GEN_VERSION);
 
     await replaceInFile({
       files: path.join(
         this.ctx.rootDir,
         "website/docs/cordova/installation.mdx",
       ),
-      from: /--PLAY_SERVICES_VERSION=([\d\.]+)/g,
-      to: `--PLAY_SERVICES_VERSION=${PLAY_SERVICES_VERSION}`,
+      from: /--GMA_NEXT_GEN_VERSION=([\d\.]+)/g,
+      to: `--GMA_NEXT_GEN_VERSION=${GMA_NEXT_GEN_VERSION}`,
     });
 
     return {} as Record<string, string>;

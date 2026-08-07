@@ -7,20 +7,17 @@ import admob.plus.core.dpToPx
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import com.google.android.gms.ads.AdListener
-import com.google.android.gms.ads.AdLoader
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.nativead.NativeAd
-import com.google.android.gms.ads.nativead.NativeAdOptions
-import com.google.android.gms.ads.nativead.NativeAdView
+import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
+import com.google.android.libraries.ads.mobile.sdk.nativead.NativeAd
+import com.google.android.libraries.ads.mobile.sdk.nativead.NativeAdLoader
+import com.google.android.libraries.ads.mobile.sdk.nativead.NativeAdLoaderCallback
+import com.google.android.libraries.ads.mobile.sdk.nativead.NativeAdRequest
+import com.google.android.libraries.ads.mobile.sdk.nativead.NativeAdView
 import java.util.Objects
 import java.util.concurrent.ConcurrentHashMap
 
 class Native(ctx: ExecuteContext) : AdBase(ctx) {
-    private val mAdRequest: AdRequest = buildAdRequest(initOpts)
     private val viewProvider: ViewProvider
-    private var mLoader: AdLoader? = null
     private var mAd: NativeAd? = null
     private var view: View? = null
 
@@ -34,50 +31,26 @@ class Native(ctx: ExecuteContext) : AdBase(ctx) {
         super.onDestroy()
     }
 
-    override val isLoaded: Boolean get() = mLoader != null && !mLoader!!.isLoading
+    override val isLoaded: Boolean get() = mAd != null
 
     override fun load(ctx: ExecuteContext) {
         clear()
-        mLoader = AdLoader.Builder(plugin.activity, adUnitId)
-            .forNativeAd { nativeAd -> mAd = nativeAd }
-            .withAdListener(object : AdListener() {
-                override fun onAdFailedToLoad(adError: LoadAdError) {
-                    emit(Events.AD_LOAD_FAIL, adError)
-                    if (isLoaded) {
-                        ctx.reject(adError.toString())
-                    }
-                }
-
-                override fun onAdClosed() {
-                    emit(Events.AD_DISMISS)
-                }
-
-                override fun onAdOpened() {
-                    emit(Events.AD_SHOW)
-                }
-
-                override fun onAdLoaded() {
-                    emit(Events.AD_LOAD)
-                    if (isLoaded) {
-                        ctx.resolve()
-                    }
-                }
-
-                override fun onAdClicked() {
-                    emit(Events.AD_CLICK)
-                }
-
-                override fun onAdImpression() {
-                    emit(Events.AD_IMPRESSION)
-                }
-            })
-            .withNativeAdOptions(
-                NativeAdOptions.Builder()
-                    .build()
-            )
-            .build().also {
-                it.loadAd(mAdRequest)
+        val request = NativeAdRequest.Builder(
+            adUnitId,
+            listOf(NativeAd.NativeAdType.NATIVE),
+        ).build()
+        NativeAdLoader.load(request, object : NativeAdLoaderCallback {
+            override fun onNativeAdLoaded(nativeAd: NativeAd) {
+                mAd = nativeAd
+                emit(Events.AD_LOAD)
+                ctx.resolve()
             }
+
+            override fun onAdFailedToLoad(adError: LoadAdError) {
+                emit(Events.AD_LOAD_FAIL, adError)
+                ctx.reject(adError.toString())
+            }
+        })
     }
 
     override fun show(ctx: ExecuteContext) {
@@ -125,7 +98,6 @@ class Native(ctx: ExecuteContext) : AdBase(ctx) {
             }
             view = null
         }
-        mLoader = null
     }
 
     interface ViewProvider {
