@@ -174,7 +174,9 @@ var MobileAd = /** @class */ (function () {
             args[_i] = arguments[_i];
         }
         var eventName = args[0], cb = args[1], rest = args.slice(2);
-        var type = "admob.ad.".concat(eventName.toLowerCase());
+        var type = eventName.toLowerCase() === "size"
+            ? "admob.banner.size"
+            : "admob.ad.".concat(eventName.toLowerCase());
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         // biome-ignore lint/suspicious/noExplicitAny: <explanation>
         var listener = function (evt) {
