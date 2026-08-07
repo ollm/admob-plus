@@ -44,16 +44,14 @@ fun buildGravity(opts: JSONObject): Int {
     return if ("top" == opts.optString("position")) Gravity.TOP else Gravity.BOTTOM
 }
 
-fun buildOffset(opts: JSONObject): Int? {
-    return if (opts.has("offset")) {
-        opts.optInt("offset")
-    } else null
+fun buildOffset(opts: JSONObject): Int {
+    return opts.optInt("offset", 0)
 }
 
 class Banner(ctx: ExecuteContext) : AdBase(ctx) {
     private val adSize: AdSize
     private val gravity: Int
-    private val offset: Int?
+    private val offset: Int
     private var mAdView: AdView? = null
     private var mRelativeLayout: RelativeLayout? = null
     private var mAdViewOld: AdView? = null
@@ -206,13 +204,8 @@ class Banner(ctx: ExecuteContext) : AdBase(ctx) {
 
     private fun addBannerView() {
         if (mAdView == null) return
-        if (offset == null) {
-            if (getParentView(mAdView) === rootLinearLayout && rootLinearLayout != null) return
-            addBannerViewWithLinearLayout()
-        } else {
-            if (getParentView(mAdView) === mRelativeLayout && mRelativeLayout != null) return
-            addBannerViewWithRelativeLayout()
-        }
+        if (getParentView(mAdView) === mRelativeLayout && mRelativeLayout != null) return
+        addBannerViewWithRelativeLayout()
         plugin.contentView?.let {
             it.bringToFront()
             it.requestLayout()
