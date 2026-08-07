@@ -19,6 +19,7 @@
         <preference name="android-minSdkVersion" default="24" />
 
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
+            <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="$APP_ID_ANDROID" />
         </config-file>
 
         <config-file target="res/xml/config.xml" parent="/*">
