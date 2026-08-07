@@ -27,7 +27,7 @@ class AdMobWebviewAdPlugin: CDVPlugin, CDVPluginNavigationHandler {
         if let x = self.commandDelegate.settings["AdMobPlusOverrideUrlLoading".lowercased()] as? String {
             overrideUrlLoading = x == "true"
         }
-        NSLog("[AdMobWebViewAd] Override URL loading: \(overrideUrlLoading)")
+        NSLog("%@", "[AdMobWebViewAd] Override URL loading: \(overrideUrlLoading)")
     }
 
     @objc func shouldOverrideLoad(with request: URLRequest, navigationType: CDVWebViewNavigationType, info: [AnyHashable: Any]) -> Bool {
@@ -47,7 +47,7 @@ class AdMobWebviewAdPlugin: CDVPlugin, CDVPluginNavigationHandler {
         let isMainFrameNavigation = targetFrame?.isMainFrame ?? (sourceFrame?.isMainFrame ?? true)
         let infoKeys = info.keys.map { String(describing: $0) }.sorted().joined(separator: ",")
 
-        NSLog("[AdMobWebViewAd] Navigation request: url=\(url.absoluteString), type=\(navigationType), override=\(overrideUrlLoading), current=\(currentURL?.absoluteString ?? "nil"), mainFrame=\(isMainFrameNavigation), newWindow=\(isNewWindowNavigation), infoKeys=\(infoKeys)")
+        NSLog("%@", "[AdMobWebViewAd] Navigation request: url=\(url.absoluteString), type=\(navigationType), override=\(overrideUrlLoading), current=\(currentURL?.absoluteString ?? "nil"), mainFrame=\(isMainFrameNavigation), newWindow=\(isNewWindowNavigation), infoKeys=\(infoKeys)")
 
         if overrideUrlLoading {
             if url.scheme == "http" || url.scheme == "https" {
@@ -65,22 +65,22 @@ class AdMobWebviewAdPlugin: CDVPlugin, CDVPluginNavigationHandler {
                 }
 
                 if !allowNavigationsPass {
-                    NSLog("[AdMobWebViewAd] Opening URL in external browser: \(url.absoluteString)")
+                    NSLog("%@", "[AdMobWebViewAd] Opening URL in external browser: \(url.absoluteString)")
                     DispatchQueue.main.async {
                         guard UIApplication.shared.canOpenURL(url) else {
-                            NSLog("[AdMobWebViewAd] Cannot open URL: \(url.absoluteString)")
+                            NSLog("%@", "[AdMobWebViewAd] Cannot open URL: \(url.absoluteString)")
                             return
                         }
 
                         UIApplication.shared.open(url, options: [:]) { success in
-                            NSLog("[AdMobWebViewAd] External URL open result: \(success), url=\(url.absoluteString)")
+                            NSLog("%@", "[AdMobWebViewAd] External URL open result: \(success), url=\(url.absoluteString)")
                         }
                     }
                 } else {
-                    NSLog("[AdMobWebViewAd] Allowing URL in WebView: \(url.absoluteString)")
+                    NSLog("%@", "[AdMobWebViewAd] Allowing URL in WebView: \(url.absoluteString)")
                 }
             } else {
-                NSLog("[AdMobWebViewAd] Non HTTP(S) URL passed to WebView: \(url.absoluteString)")
+                NSLog("%@", "[AdMobWebViewAd] Non HTTP(S) URL passed to WebView: \(url.absoluteString)")
             }
         }
 
