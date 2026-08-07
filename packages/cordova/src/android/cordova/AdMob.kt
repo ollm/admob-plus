@@ -12,6 +12,7 @@ import admob.plus.core.buildRequestConfiguration
 import admob.plus.core.configForTestLabIfNeeded
 import admob.plus.core.isRunningInTestLab
 import android.app.Activity
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.util.Log
 import android.view.ViewGroup
@@ -27,6 +28,7 @@ import org.json.JSONObject
 
 
 private const val TAG = "AdMobPlus"
+private const val APP_ID_METADATA_KEY = "com.google.android.gms.ads.APPLICATION_ID"
 
 class AdMob : CordovaPlugin() {
     lateinit var context: CallbackContext
@@ -85,9 +87,13 @@ class AdMob : CordovaPlugin() {
             ctx.resolve(mapOf("version" to version))
             return
         }
+        val appId = ctx.activity.packageManager
+            .getApplicationInfo(ctx.activity.packageName, PackageManager.GET_META_DATA)
+            .metaData?.getString(APP_ID_METADATA_KEY)
+            ?: preferences.getString("APP_ID_ANDROID", "ca-app-pub-xxx~yyy")
         MobileAds.initialize(
             ctx.activity,
-            InitializationConfig.Builder(preferences.getString("APP_ID_ANDROID", "ca-app-pub-xxx~yyy")).build()
+            InitializationConfig.Builder(appId).build()
         ) {
             configForTestLabIfNeeded(ctx.activity)
             ctx.resolve(mapOf("version" to version))
