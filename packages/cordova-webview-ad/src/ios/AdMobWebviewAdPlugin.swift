@@ -5,9 +5,10 @@ import UIKit
 import WebKit
 
 @objc(AdMobWebviewAdPlugin)
-class AdMobWebviewAdPlugin: CDVPlugin, CDVPluginNavigationHandler {
+class AdMobWebviewAdPlugin: CDVPlugin, CDVPluginNavigationHandler, WKUIDelegate {
 
     var overrideUrlLoading: Bool = true
+    weak var navigationUIDelegate: WKUIDelegate?
 
     override func pluginInitialize() {
         super.pluginInitialize()
@@ -26,6 +27,53 @@ class AdMobWebviewAdPlugin: CDVPlugin, CDVPluginNavigationHandler {
             overrideUrlLoading = x == "true"
         }
         NSLog("%@", "[AdMobWebViewAd] Override URL loading: \(overrideUrlLoading)")
+
+        if overrideUrlLoading,
+           let webView = self.webViewEngine.engineWebView as? WKWebView {
+            navigationUIDelegate = webView.uiDelegate
+            webView.uiDelegate = self
+        }
+    }
+
+    override func responds(to selector: Selector!) -> Bool {
+        super.responds(to: selector) || navigationUIDelegate?.responds(to: selector) == true
+    }
+
+    override func forwardingTarget(for selector: Selector!) -> Any? {
+        if navigationUIDelegate?.responds(to: selector) == true {
+            return navigationUIDelegate
+        }
+        return super.forwardingTarget(for: selector)
+    }
+
+    func webView(
+        _ webView: WKWebView,
+        createWebViewWith configuration: WKWebViewConfiguration,
+        for navigationAction: WKNavigationAction,
+        windowFeatures: WKWindowFeatures
+    ) -> WKWebView? {
+        guard let url = navigationAction.request.url,
+              url.scheme == "http" || url.scheme == "https" else {
+            return navigationUIDelegate?.webView?(
+                webView,
+                createWebViewWith: configuration,
+                for: navigationAction,
+                windowFeatures: windowFeatures
+            )
+        }
+
+        NSLog("%@", "[AdMobWebViewAd] Opening window URL in external browser: \(url.absoluteString)")
+        DispatchQueue.main.async {
+            guard UIApplication.shared.canOpenURL(url) else {
+                NSLog("%@", "[AdMobWebViewAd] Cannot open window URL: \(url.absoluteString)")
+                return
+            }
+
+            UIApplication.shared.open(url, options: [:]) { success in
+                NSLog("%@", "[AdMobWebViewAd] Window URL open result: \(success), url=\(url.absoluteString)")
+            }
+        }
+        return nil
     }
 
     @objc func shouldOverrideLoad(with request: URLRequest, navigationType: CDVWebViewNavigationType, info: [AnyHashable: Any]) -> Bool {
