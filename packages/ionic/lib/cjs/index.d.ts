@@ -66,6 +66,7 @@ export declare class NativeAd extends IonicNativePlugin implements Omit<INativeA
     isLoaded(): Promise<boolean>;
     load(): Promise<void>;
     show(...args: Parameters<INativeAd['show']>): Promise<unknown>;
+    update(...args: Parameters<INativeAd['update']>): Promise<void>;
     hide(): Promise<unknown>;
     showWith(...args: Parameters<INativeAd['showWith']>): Promise<void>;
     on(...opts: Parameters<INativeAd['on']>): () => void;

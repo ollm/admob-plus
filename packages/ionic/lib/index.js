@@ -234,6 +234,14 @@ var NativeAd = /** @class */ (function (_super) {
         }
         return (_a = this.obj).show.apply(_a, args);
     };
+    NativeAd.prototype.update = function () {
+        var _a;
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        return (_a = this.obj).update.apply(_a, args);
+    };
     NativeAd.prototype.hide = function () {
         return this.obj.hide();
     };

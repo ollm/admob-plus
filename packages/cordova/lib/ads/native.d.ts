@@ -10,10 +10,12 @@ export interface NativeAdOptions extends MobileAdOptions {
 }
 export declare class NativeAd extends MobileAd<NativeAdOptions> {
     static readonly cls = "NativeAd";
+    private elm?;
     isLoaded(): Promise<boolean>;
     hide(): Promise<unknown>;
     load(): Promise<void>;
     show(opts?: ShowOptions): Promise<unknown>;
+    update(elm?: HTMLElement): Promise<void>;
     showWith(elm: HTMLElement): Promise<void>;
 }
 export {};

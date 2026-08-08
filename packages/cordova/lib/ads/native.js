@@ -89,6 +89,30 @@ var NativeAd = /** @class */ (function (_super) {
             });
         });
     };
+    NativeAd.prototype.update = function (elm) {
+        return __awaiter(this, void 0, void 0, function () {
+            var element, r;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        element = elm !== null && elm !== void 0 ? elm : this.elm;
+                        if (!element) {
+                            throw new Error("NativeAd element is not set");
+                        }
+                        r = element.getBoundingClientRect();
+                        return [4 /*yield*/, this.show({
+                                x: r.x,
+                                y: r.y,
+                                width: r.width,
+                                height: r.height,
+                            })];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
     NativeAd.prototype.showWith = function (elm) {
         return __awaiter(this, void 0, void 0, function () {
             var update, observer;
@@ -96,24 +120,8 @@ var NativeAd = /** @class */ (function (_super) {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        update = function () { return __awaiter(_this, void 0, void 0, function () {
-                            var r;
-                            return __generator(this, function (_a) {
-                                switch (_a.label) {
-                                    case 0:
-                                        r = elm.getBoundingClientRect();
-                                        return [4 /*yield*/, this.show({
-                                                x: r.x,
-                                                y: r.y,
-                                                width: r.width,
-                                                height: r.height,
-                                            })];
-                                    case 1:
-                                        _a.sent();
-                                        return [2 /*return*/];
-                                }
-                            });
-                        }); };
+                        this.elm = elm;
+                        update = function () { return _this.update(); };
                         observer = new MutationObserver(update);
                         observer.observe(document.body, {
                             attributes: true,
