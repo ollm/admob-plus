@@ -55,15 +55,25 @@ class Native(ctx: ExecuteContext) : AdBase(ctx) {
 
     override fun show(ctx: ExecuteContext) {
         val ad = mAd ?: return ctx.reject("ad not loaded")
+        val contentView = Objects.requireNonNull<ViewGroup>(plugin.contentView)
         view = view ?: let {
             val v = viewProvider.createView(ad)
-            Objects.requireNonNull<ViewGroup>(plugin.contentView).addView(v)
+            contentView.addView(v)
             v
         }
         view?.let {
             it.visibility = View.VISIBLE
-            it.x = dpToPx(ctx.opts.optDouble("x", 0.0)).toFloat()
-            it.y = dpToPx(ctx.opts.optDouble("y", 0.0)).toFloat()
+
+            val webViewLocation = IntArray(2)
+            val contentViewLocation = IntArray(2)
+            webView.getLocationOnScreen(webViewLocation)
+            contentView.getLocationOnScreen(contentViewLocation)
+            val density = webView.resources.displayMetrics.density
+            val xOffset = (webViewLocation[0] - contentViewLocation[0]) / density
+            val yOffset = (webViewLocation[1] - contentViewLocation[1]) / density
+
+            it.x = dpToPx(ctx.opts.optDouble("x", 0.0) + xOffset).toFloat()
+            it.y = dpToPx(ctx.opts.optDouble("y", 0.0) + yOffset).toFloat()
 
             val params = it.layoutParams
             params.width = dpToPx(ctx.opts.optDouble("width", 0.0)).toInt()

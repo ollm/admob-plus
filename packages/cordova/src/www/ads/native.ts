@@ -8,6 +8,7 @@ export interface NativeAdOptions extends MobileAdOptions {
 
 export class NativeAd extends MobileAd<NativeAdOptions> {
   static readonly cls = "NativeAd";
+  private elm?: HTMLElement;
 
   public isLoaded() {
     return super.isLoaded();
@@ -31,16 +32,23 @@ export class NativeAd extends MobileAd<NativeAdOptions> {
     });
   }
 
+  async update(elm?: HTMLElement) {
+    const element = elm ?? this.elm;
+    if (!element) {
+      throw new Error("NativeAd element is not set");
+    }
+    const r = element.getBoundingClientRect();
+    await this.show({
+      x: r.x,
+      y: r.y,
+      width: r.width,
+      height: r.height,
+    });
+  }
+
   async showWith(elm: HTMLElement) {
-    const update = async () => {
-      const r = elm.getBoundingClientRect();
-      await this.show({
-        x: r.x,
-        y: r.y,
-        width: r.width,
-        height: r.height,
-      });
-    };
+    this.elm = elm;
+    const update = () => this.update();
     const observer = new MutationObserver(update);
     observer.observe(document.body, {
       attributes: true,
