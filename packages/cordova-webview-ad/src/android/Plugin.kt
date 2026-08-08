@@ -1,10 +1,12 @@
 package admob.plus.cordova.webviewad
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.util.Log
 import android.webkit.WebView
 import com.google.android.libraries.ads.mobile.sdk.MobileAds
+import com.google.android.libraries.ads.mobile.sdk.initialization.InitializationConfig
 import org.apache.cordova.CallbackContext
 import org.apache.cordova.CordovaInterface
 import org.apache.cordova.CordovaPlugin
@@ -27,9 +29,26 @@ class Plugin : CordovaPlugin() {
         cordova.activity.runOnUiThread {
             if (isWebviewAdEnabled) {
                 val webView = cordovaWebView.view as WebView
-                MobileAds.registerWebView(webView)
-                webView.reload()
-                Log.d(TAG, "Integrated the WebView API for Ads in ${webView.url} WebView")
+                val appId = cordova.activity.packageManager
+                    .getApplicationInfo(
+                        cordova.activity.packageName,
+                        PackageManager.GET_META_DATA
+                    )
+                    .metaData?.getString(APP_ID_METADATA_KEY)
+                if (appId == null) {
+                    Log.e(TAG, "Unable to initialize Mobile Ads: app ID is missing")
+                    return@runOnUiThread
+                }
+                MobileAds.initialize(
+                    cordova.activity,
+                    InitializationConfig.Builder(appId).build()
+                ) {
+                    cordova.activity.runOnUiThread {
+                        MobileAds.registerWebView(webView)
+                        webView.reload()
+                        Log.d(TAG, "Integrated the WebView API for Ads in ${webView.url} WebView")
+                    }
+                }
             }
         }
         super.initialize(cordova, cordovaWebView)
@@ -74,5 +93,6 @@ class Plugin : CordovaPlugin() {
 
     companion object {
         private const val TAG = "AdMobWebViewAd"
+        private const val APP_ID_METADATA_KEY = "com.google.android.gms.ads.APPLICATION_ID"
     }
 }

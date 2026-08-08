@@ -17,8 +17,7 @@ class AdViewProvider(private val cordova: CordovaInterface) : ViewProvider {
         val adView = cordova.activity.layoutInflater
             .inflate(getResourceId("ad_unified", "layout"), null) as NativeAdView
         // Set the media view.
-        adView.mediaView =
-            adView.findViewById<View>(id("ad_media")) as MediaView
+        val mediaView = adView.findViewById<View>(id("ad_media")) as MediaView
 
         // Set other ad assets.
         adView.headlineView = adView.findViewById(id("ad_headline"))
@@ -32,7 +31,6 @@ class AdViewProvider(private val cordova: CordovaInterface) : ViewProvider {
 
         // The headline and mediaContent are guaranteed to be in every NativeAd.
         (adView.headlineView as TextView?)!!.text = nativeAd.headline
-        adView.mediaView!!.mediaContent = nativeAd.mediaContent
 
         // These assets aren't guaranteed to be in every NativeAd, so it's important to
         // check before trying to display them.
@@ -83,7 +81,7 @@ class AdViewProvider(private val cordova: CordovaInterface) : ViewProvider {
 
         // This method tells the Google Mobile Ads SDK that you have finished populating your
         // native ad view with this native ad.
-        adView.setNativeAd(nativeAd)
+        adView.registerNativeAd(nativeAd, mediaView)
         return adView
     }
 

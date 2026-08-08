@@ -182,14 +182,14 @@ importers:
         specifier: ^12.0.0
         version: 12.0.0
       cordova-android:
-        specifier: 14.0.0
-        version: 14.0.0
+        specifier: ^15.1.0
+        version: 15.1.0
       cordova-browser:
-        specifier: 7.0.0
+        specifier: ^7.0.0
         version: 7.0.0
       cordova-ios:
-        specifier: 8.0.0
-        version: 8.0.0
+        specifier: ^8.1.1
+        version: 8.1.1
       cordova-plus:
         specifier: ^0.9.4
         version: 0.9.4(enquirer@2.4.1)
@@ -213,11 +213,11 @@ importers:
         specifier: ^12.0.0
         version: 12.0.0
       cordova-android:
-        specifier: ^13.0.0
-        version: 13.0.0
+        specifier: ^15.1.0
+        version: 15.1.0
       cordova-ios:
-        specifier: ^8.0.0
-        version: 8.0.0
+        specifier: ^8.1.1
+        version: 8.1.1
 
   examples/ionic-angular:
     dependencies:
@@ -636,14 +636,14 @@ importers:
         specifier: ^12.0.0
         version: 12.0.0
       cordova-android:
-        specifier: ^13.0.0
-        version: 13.0.0
+        specifier: ^15.1.0
+        version: 15.1.0
       cordova-browser:
         specifier: ^7.0.0
         version: 7.0.0
       cordova-ios:
-        specifier: ^8.0.0
-        version: 8.0.0
+        specifier: ^8.1.1
+        version: 8.1.1
       cordova-plugin-consent:
         specifier: ../../packages/cordova-consent
         version: link:../../packages/cordova-consent
@@ -6881,8 +6881,8 @@ packages:
   android-versions@1.9.0:
     resolution: {integrity: sha512-13O2B6PQMEM4ej9n13ePRQeckrCoKbZrvuzlLvK+9s2QmncpHDbYzZxhgapN32sJNoifN6VAHexLnd/6CYrs7Q==}
 
-  android-versions@2.1.0:
-    resolution: {integrity: sha512-oCBvVs2uaL8ohQtesGs78/X7QvFDLbKgTosBRiOIBCss1a/yiakQm/ADuoG2k/AUaI0FfrsFeMl/a+GtEtjEeA==}
+  android-versions@2.2.0:
+    resolution: {integrity: sha512-lrad0HHmy9406sSmBHYIetx4n3WMnVVD+HMv7C+YJrByLFGPYWvlM1WcYrYL+e2s1GErvRF85nWsRY7RpwIGLw==}
 
   anser@1.4.10:
     resolution: {integrity: sha512-hCv9AqTQ8ycjpSd3upOJd7vFwW1JaoYQ7tpham03GJ1ca8/65rqn0RpaWpItOAd6ylW9wAw6luXYPJIyPFVOww==}
@@ -8513,13 +8513,9 @@ packages:
     resolution: {integrity: sha512-6fXWoYb/X5AJlluhBg5RvOaX6iRxsvNH7yEOiXzUmLIflf5Ho7LtYCSKZaWMHh3f5cJe/sPCBKmFFBS+EWepVg==}
     engines: {node: '>=16.13.0'}
 
-  cordova-android@13.0.0:
-    resolution: {integrity: sha512-uQG+cSyrB1NMi2aIzihldIupHB9WGpZVvrMMMAAtnyc6tDlEk7gweSSaFsEONyGAnteRYpIvrzg/YwDW08PcUg==}
-    engines: {node: '>=16.13.0'}
-
-  cordova-android@14.0.0:
-    resolution: {integrity: sha512-aPlN2aBfC/OlZOlCR66x9GYBfnHTlmm2Dd1eYcqB+Mwm0wJFlA272psHmfiMqA5VRT5UpFyCQ5x6B1YA9h2uHg==}
-    engines: {node: '>=20.5.0'}
+  cordova-android@15.1.0:
+    resolution: {integrity: sha512-mnOnOisYUVhyrLCPVlHJBKh4ro+X6nZA7nPqBrpVnyTpiiDiakNCfbBJjSs1MTBUJZ6dcmhhvNKZWPT9w6aGPA==}
+    engines: {node: '>=20.17.0 || >=22.9.0'}
 
   cordova-app-hello-world@4.0.0:
     resolution: {integrity: sha512-hTNYHUJT5YyMa1cQQE1naGyU6Eh5D5Jl33sMnCh3+q15ZwWTL/TOy3k8+mUvjTp8bwhO5eECGKULYoVO+fp9ZA==}
@@ -8588,8 +8584,8 @@ packages:
     resolution: {integrity: sha512-BZybgFzc7D0HmhkTYurFrRXiWgvYohmT7bwQsLPhf+VdiDjwGXbiSWgg3uP9MChvacCNcGXXUl2NhOaNC9UVaA==}
     engines: {node: '>=10'}
 
-  cordova-ios@8.0.0:
-    resolution: {integrity: sha512-QsynOV8rnRIhDC3qwM1KdRr1gy5RaqzVCzdOaB+DSBPeR5wVEUGpyyJO0FzlCACzY5X25iDc5O3kbn/F06dJ5Q==}
+  cordova-ios@8.1.1:
+    resolution: {integrity: sha512-fiowa8HeuVd45ZI2fb2az1qDAqlm3H9ruVcXBDUJ3FneMoMmwKKrsrg2tc5L4C8z2ZTZ3d7+NDl/XqJ2M9Ydyw==}
     engines: {node: ^20.17.0 || >=22.9.0}
 
   cordova-lib@11.1.0:
@@ -9200,6 +9196,14 @@ packages:
 
   dedent@1.5.3:
     resolution: {integrity: sha512-NHQtfOOW68WD8lgypbLA5oT+Bt0xXJhiYvoR6SmmNXZfpzOGXwdKWmcwG8N7PwVVWV3eF/68nmD9BaJSsTBhyQ==}
+    peerDependencies:
+      babel-plugin-macros: ^3.1.0
+    peerDependenciesMeta:
+      babel-plugin-macros:
+        optional: true
+
+  dedent@1.7.2:
+    resolution: {integrity: sha512-WzMx3mW98SN+zn3hgemf4OzdmyNhhhKz5Ay0pUfQiMQ3e1g+xmTJWp/pKdwKVXhdSkAEGIIzqeuWrL3mV/AXbA==}
     peerDependencies:
       babel-plugin-macros: ^3.1.0
     peerDependenciesMeta:
@@ -29766,9 +29770,9 @@ snapshots:
     dependencies:
       semver: 7.7.1
 
-  android-versions@2.1.0:
+  android-versions@2.2.0:
     dependencies:
-      semver: 7.7.1
+      semver: 7.8.5
 
   anser@1.4.10: {}
 
@@ -31948,38 +31952,20 @@ snapshots:
     transitivePeerDependencies:
       - babel-plugin-macros
 
-  cordova-android@13.0.0:
+  cordova-android@15.1.0:
     dependencies:
-      android-versions: 2.1.0
-      cordova-common: 5.0.1
-      dedent: 1.5.3
-      execa: 5.1.1
-      fast-glob: 3.3.3
-      fs-extra: 11.3.0
-      is-path-inside: 3.0.3
-      nopt: 7.2.1
-      properties-parser: 0.6.0
-      semver: 7.7.1
-      string-argv: 0.3.2
-      untildify: 4.0.0
-      which: 4.0.0
-    transitivePeerDependencies:
-      - babel-plugin-macros
-
-  cordova-android@14.0.0:
-    dependencies:
-      android-versions: 2.1.0
-      cordova-common: 5.0.1
-      dedent: 1.5.3
+      android-versions: 2.2.0
+      cordova-common: 6.0.0
+      dedent: 1.7.2
       execa: 5.1.1
       fast-glob: 3.3.3
       is-path-inside: 3.0.3
-      nopt: 8.1.0
+      nopt: 9.0.0
       properties-parser: 0.6.0
-      semver: 7.7.1
+      semver: 7.8.5
       string-argv: 0.3.2
       untildify: 4.0.0
-      which: 5.0.0
+      which: 6.0.1
     transitivePeerDependencies:
       - babel-plugin-macros
 
@@ -32194,7 +32180,7 @@ snapshots:
       xcode: 3.0.1
       xml-escape: 1.1.0
 
-  cordova-ios@8.0.0:
+  cordova-ios@8.1.1:
     dependencies:
       bplist-parser: 0.3.2
       cordova-common: 6.0.0
@@ -33081,6 +33067,8 @@ snapshots:
   dedent@0.7.0: {}
 
   dedent@1.5.3: {}
+
+  dedent@1.7.2: {}
 
   deep-eql@5.0.2: {}
 
