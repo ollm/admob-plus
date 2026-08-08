@@ -13,11 +13,12 @@ type BannerSize = AdSizeType | {
     height: number;
 } | {
     adaptive: "anchored";
-    orientation?: "portrait" | "landscape";
+    orientation?: "portrait" | "landscape" | "current";
     width?: number;
 } | {
     adaptive: "inline";
     maxHeight: number;
+    orientation?: "portrait" | "current";
     width?: number;
 };
 export interface BannerAdOptions extends MobileAdOptions {
