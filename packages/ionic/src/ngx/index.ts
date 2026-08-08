@@ -224,6 +224,10 @@ export class NativeAd
     return this.obj.show(...args);
   }
 
+  update(...args: Parameters<INativeAd['update']>) {
+    return this.obj.update(...args);
+  }
+
   hide() {
     return this.obj.hide();
   }
