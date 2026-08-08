@@ -44,10 +44,15 @@ fun buildAdSize(opts: JSONObject, activity: Activity): AdSize {
         pxToDp(if (adSizeObj.has("width")) adSizeObj.optInt("width") else Resources.getSystem().displayMetrics.widthPixels)
     if ("inline" == adaptive) {
         if (adSizeObj.has("maxHeight")) {
-            return AdSize.getInlineAdaptiveBannerAdSize(
-                w,
-                pxToDp(adSizeObj.optInt("maxHeight"))
-            )
+            val maxHeight = pxToDp(adSizeObj.optInt("maxHeight"))
+            val inlineAdSize = when (adSizeObj.optString("orientation")) {
+                "portrait" -> AdSize.getPortraitInlineAdaptiveBannerAdSize(activity, w)
+
+                "current" -> AdSize.getCurrentOrientationInlineAdaptiveBannerAdSize(activity, w)
+
+                else -> AdSize.getInlineAdaptiveBannerAdSize(w, maxHeight)
+            }
+            return inlineAdSize
         }
     } else {
         return when (adSizeObj.optString("orientation")) {
@@ -56,6 +61,10 @@ fun buildAdSize(opts: JSONObject, activity: Activity): AdSize {
             )
 
             "landscape" -> AdSize.getLargeLandscapeAnchoredAdaptiveBannerAdSize(
+                activity, w
+            )
+
+            "current" -> AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
                 activity, w
             )
 
