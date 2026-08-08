@@ -1,36 +1,36 @@
-import { Injectable } from "@angular/core";
-import { IonicNativePlugin } from "@ionic-native/core";
+import {Injectable} from '@angular/core';
+import {IonicNativePlugin} from '@ionic-native/core';
 import type {
-  BannerAdOptions,
   AdMob as IAdMob,
   BannerAd as IBannerAd,
+  BannerAdOptions,
   InterstitialAd as IInterstitialAd,
-  NativeAd as INativeAd,
-  RewardedAd as IRewardedAd,
-  RewardedInterstitialAd as IRewardedInterstitialAd,
   NativeAdOptions,
+  RewardedAd as IRewardedAd,
   RewardedAdOptions,
+  RewardedInterstitialAd as IRewardedInterstitialAd,
+  NativeAd as INativeAd,
   RewardedInterstitialAdOptions,
-} from "admob-plus-cordova";
-import { type Observable, fromEvent } from "rxjs";
+} from 'admob-plus-cordova';
+import {fromEvent, Observable} from 'rxjs';
 
-const plugin = "admob-plus-cordova";
-const pluginName = "AdMob";
+const plugin = 'admob-plus-cordova';
+const pluginName = 'AdMob';
 
 // helper
 const h = {
   get admob() {
-    return (window as unknown as { admob: IAdMob }).admob;
+    return (window as unknown as {admob: IAdMob}).admob;
   },
 };
 
 export class BannerAd
   extends IonicNativePlugin
-  implements Omit<IBannerAd, "opts">
+  implements Omit<IBannerAd, 'opts'>
 {
   public static plugin = plugin;
   public static pluginName = pluginName;
-  public static pluginRef = "admob.BannerAd";
+  public static pluginRef = 'admob.BannerAd';
 
   private obj: IBannerAd;
 
@@ -60,22 +60,22 @@ export class BannerAd
     return this.obj.hide();
   }
 
-  on(...opts: Parameters<IBannerAd["on"]>) {
+  on(...opts: Parameters<IBannerAd['on']>) {
     return this.obj.on(...opts);
   }
 }
 
 export class InterstitialAd
   extends IonicNativePlugin
-  implements Omit<IInterstitialAd, "opts">
+  implements Omit<IInterstitialAd, 'opts'>
 {
   public static plugin = plugin;
   public static pluginName = pluginName;
-  public static pluginRef = "admob.InterstitialAd";
+  public static pluginRef = 'admob.InterstitialAd';
 
   private obj: IInterstitialAd;
 
-  constructor(opts: { adUnitId: string }) {
+  constructor(opts: {adUnitId: string}) {
     super();
 
     this.obj = new h.admob.InterstitialAd(opts);
@@ -101,18 +101,18 @@ export class InterstitialAd
     return this.obj.show();
   }
 
-  on(...opts: Parameters<IInterstitialAd["on"]>) {
+  on(...opts: Parameters<IInterstitialAd['on']>) {
     return this.obj.on(...opts);
   }
 }
 
 export class RewardedAd
   extends IonicNativePlugin
-  implements Omit<IRewardedAd, "opts">
+  implements Omit<IRewardedAd, 'opts'>
 {
   public static plugin = plugin;
   public static pluginName = pluginName;
-  public static pluginRef = "admob.RewardedAd";
+  public static pluginRef = 'admob.RewardedAd';
 
   private obj: IRewardedAd;
 
@@ -142,18 +142,18 @@ export class RewardedAd
     return this.obj.show();
   }
 
-  on(...opts: Parameters<IRewardedAd["on"]>) {
+  on(...opts: Parameters<IRewardedAd['on']>) {
     return this.obj.on(...opts);
   }
 }
 
 export class RewardedInterstitialAd
   extends IonicNativePlugin
-  implements Omit<IRewardedInterstitialAd, "opts">
+  implements Omit<IRewardedInterstitialAd, 'opts'>
 {
   public static plugin = plugin;
   public static pluginName = pluginName;
-  public static pluginRef = "admob.RewardedInterstitialAd";
+  public static pluginRef = 'admob.RewardedInterstitialAd';
 
   private obj: IRewardedInterstitialAd;
 
@@ -183,18 +183,18 @@ export class RewardedInterstitialAd
     return this.obj.show();
   }
 
-  on(...opts: Parameters<IRewardedInterstitialAd["on"]>) {
+  on(...opts: Parameters<IRewardedInterstitialAd['on']>) {
     return this.obj.on(...opts);
   }
 }
 
 export class NativeAd
   extends IonicNativePlugin
-  implements Omit<INativeAd, "opts">
+  implements Omit<INativeAd, 'opts'>
 {
   public static plugin = plugin;
   public static pluginName = pluginName;
-  public static pluginRef = "admob.NativeAd";
+  public static pluginRef = 'admob.NativeAd';
 
   private obj: INativeAd;
 
@@ -220,11 +220,11 @@ export class NativeAd
     return this.obj.load();
   }
 
-  public show(...args: Parameters<INativeAd["show"]>) {
+  public show(...args: Parameters<INativeAd['show']>) {
     return this.obj.show(...args);
   }
 
-  update(...args: Parameters<INativeAd["update"]>) {
+  update(...args: Parameters<INativeAd['update']>) {
     return this.obj.update(...args);
   }
 
@@ -232,11 +232,11 @@ export class NativeAd
     return this.obj.hide();
   }
 
-  showWith(...args: Parameters<INativeAd["showWith"]>) {
+  showWith(...args: Parameters<INativeAd['showWith']>) {
     return this.obj.showWith(...args);
   }
 
-  on(...opts: Parameters<INativeAd["on"]>) {
+  on(...opts: Parameters<INativeAd['on']>) {
     return this.obj.on(...opts);
   }
 }
@@ -247,37 +247,37 @@ export class AdMob
   implements
     Omit<
       IAdMob,
-      | "AppOpenAd"
-      | "BannerAd"
-      | "BannerAd"
-      | "configRequest"
-      | "Events"
-      | "InterstitialAd"
-      | "InterstitialAd"
-      | "NativeAd"
-      | "NativeAd"
-      | "requestTrackingAuthorization"
-      | "RewardedAd"
-      | "RewardedAd"
-      | "RewardedInterstitialAd"
-      | "RewardedInterstitialAd"
-      | "setAppMuted"
-      | "setAppVolume"
-      | "TrackingAuthorizationStatus"
-      | "WebViewAd"
+      | 'AppOpenAd'
+      | 'BannerAd'
+      | 'BannerAd'
+      | 'configRequest'
+      | 'Events'
+      | 'InterstitialAd'
+      | 'InterstitialAd'
+      | 'NativeAd'
+      | 'NativeAd'
+      | 'requestTrackingAuthorization'
+      | 'RewardedAd'
+      | 'RewardedAd'
+      | 'RewardedInterstitialAd'
+      | 'RewardedInterstitialAd'
+      | 'setAppMuted'
+      | 'setAppVolume'
+      | 'TrackingAuthorizationStatus'
+      | 'WebViewAd'
     >
 {
-  public static platforms = ["Android", "iOS"];
+  public static platforms = ['Android', 'iOS'];
   public static plugin = plugin;
   public static pluginName = pluginName;
-  public static pluginRef = "admob";
-  public static repo = "https://github.com/admob-plus/admob-plus";
+  public static pluginRef = 'admob';
+  public static repo = 'https://github.com/admob-plus/admob-plus';
 
   public start() {
     return h.admob.start();
   }
 
-  public configure(...opts: Parameters<IAdMob["configure"]>) {
+  public configure(...opts: Parameters<IAdMob['configure']>) {
     return h.admob.configure(...opts);
   }
 
